@@ -1,0 +1,82 @@
+<!--
+  games.html
+  Purpose: Static page listing games for DReview. No frameworks, only shared style.css.
+  Includes: navbar, hero header, grid of game cards, and footer with team names.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DReview — Games</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body id="games-page">
+  <nav id="top-nav" class="navbar">
+    <div class="container nav-inner">
+      <a href="./home.html" class="brand">DReview</a>
+      <div class="nav-links">
+        <a href="./home.html" class="nav-link">Home</a>
+        <a href="./games.html" class="nav-link">Games</a>
+        <a href="./movies.html" class="nav-link">Movies</a>
+        <a href="./about.html" class="nav-link">About</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero section">
+      <div class="container">
+        <h1 class="hero-title">Games</h1>
+        <p class="hero-subtitle">Explore trending titles and classics. Click any card to start your review on Home.</p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid-2">
+          <article class="card">
+            <img src="images/eldenring.jpg" alt="Elden Ring" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Elden Ring</h3>
+              <p class="card-text">FromSoftware’s vast open-world action RPG.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/zelda.jpg" alt="Zelda: Breath of the Wild" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">Zelda: BOTW</h3>
+              <p class="card-text">Physics-driven exploration and freedom.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/godofwar.jpg" alt="God of War" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">God of War</h3>
+              <p class="card-text">Brutal combat meets heartfelt storytelling.</p>
+            </div>
+          </article>
+
+          <article class="card">
+            <img src="images/witcher3.jpg" alt="The Witcher 3" class="card-img" />
+            <div class="card-body">
+              <h3 class="card-title">The Witcher 3</h3>
+              <p class="card-text">Epic quests and rich characters in a vast world.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-brand">DReview</p>
+      <p class="footer-team">Team: Dauren, Roman</p>
+    </div>
+  </footer>
+</body>
+</html>

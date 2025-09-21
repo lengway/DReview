@@ -83,7 +83,7 @@ nav a.nav-link:hover { opacity: 1; color: var(--accent); text-decoration: underl
 .hero-subtitle { margin: .75rem 0 1rem; color: var(--muted); max-width: 740px; }
 .hero-actions { display: flex; gap: .75rem; }
 
-/* Cards */
+/* cards */
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
 .card {
   border: 1px solid var(--border);
@@ -100,7 +100,7 @@ nav a.nav-link:hover { opacity: 1; color: var(--accent); text-decoration: underl
 .card-text { color: var(--muted); }
 .card-cta { display: inline-block; margin-top: .5rem; color: var(--accent); }
 
-/* Forms (inputs, selects, textarea) */
+/* forms */
 .form-card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 1rem; }
 .form-row { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .9rem; }
 label { font-weight: 600; color: #d6defc; }
@@ -115,7 +115,7 @@ input:focus, select:focus, textarea:focus {
 }
 .form-actions { display: flex; gap: .75rem; }
 
-/* Footer */
+/* footer */
 .footer {
   margin-top: 48px;
   border-top: 1px solid var(--border);
@@ -127,14 +127,14 @@ input:focus, select:focus, textarea:focus {
 .footer-brand { font-weight: 800; color: var(--accent); }
 .footer-team { color: var(--muted); }
 
-/* Images */
+/* image */
 .img-circle { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid #2f3a6b; }
 
-/* Layout helpers for pages */
+/* layout */
 .page { display: flex; flex-direction: column; min-height: 100dvh; }
 main { flex: 1; }
 
-/* Responsive */
+/* responsive for mobile */
 @media (max-width: 760px) {
   .nav-links { gap: .6rem; }
   .grid-2 { grid-template-columns: 1fr; }

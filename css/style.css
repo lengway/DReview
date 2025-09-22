@@ -70,21 +70,21 @@ nav a.nav-link:hover { opacity: 1; color: var(--accent); text-decoration: underl
 .hero::before {
   content: "";
   display: inline-block;  
-  position:absolute; inset: 0 50% auto auto;
+  position: absolute; 
+  inset: 0 50% auto auto;
   width: 720px; height: 480px; border-radius: 50%;
   background: radial-gradient(50% 50% at 50% 50%, rgba(110,140,255,0.5), rgba(110,140,255,0.05));
   filter: blur(20px);
   transform: translate(20%, -10%);
-  pointer-events: none;
 }
 .hero-title {
   font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 900;
   letter-spacing: 0.3px;
   text-shadow: 0 6px 30px rgba(92, 129, 255, 0.25);
 }
-.hero-subtitle { margin: .75rem 0 1rem; color: var(--muted); max-width: 740px; }
-.hero-actions { display: flex; gap: .75rem; }
+.hero-subtitle { 
+  margin: .75rem 0 1rem; color: var(--muted); max-width: 740px; 
+}
 
 /* cards */
 .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
@@ -101,7 +101,6 @@ nav a.nav-link:hover { opacity: 1; color: var(--accent); text-decoration: underl
 .card-body { padding: 1rem; }
 .card-title { font-size: 1.1rem; margin-bottom: .25rem; }
 .card-text { color: var(--muted); }
-.card-cta { display: inline-block; margin-top: .5rem; color: var(--accent); }
 
 /* footer */
 .footer {

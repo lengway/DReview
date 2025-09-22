@@ -1,1 +1,1 @@
-D R e v i e w - is the simpliest way to acknowledge new things about games and movies. With this service you can give your persnonally review about new games and movies and discover something new about media you have never experienced.
+DReview - is the simpliest way to acknowledge new things about games and movies. With this service you can give your persnonally review about new games and movies and discover something new about media you have never experienced.

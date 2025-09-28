@@ -95,7 +95,7 @@ h3 {
 
 /* navbar */
 #top-nav.navbar {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 20;
   background: rgba(10, 15, 34, 0.8);

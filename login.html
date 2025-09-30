@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="./css/style.css" />
+  <title>DReview - Sign In</title>
+</head>
+<body id="login-page">
+  <header class="header">
+    <nav id="top-nav" class="navbar">
+      <div class="container nav-inner">
+        <a href="./home.html" class="brand-header"><img src="images/logo.png"></a>
+        <div class="nav-links">
+          <a href="./home.html" class="nav-link">Home</a>
+          <a href="./games.html" class="nav-link">Games</a>
+          <a href="./movies.html" class="nav-link">Movies</a>
+          <a href="./about.html" class="nav-link">About</a>
+          <a href="./imagegallery.html" class="nav-link">Image Gallery</a>
+          <a href="./login.html" class="nav-link nav-cta">Sign in</a>
+        </div>
+      </div>
+    </nav>
+  </header> 
+
+
+  <main class="login-container" role="main">
+    <form class="login-box" action="#" method="POST" autocomplete="on" aria-labelledby="signin-title" novalidate>
+      <header class="login-box-header">
+        <h2 id="signin-title">Sign In</h2>
+      </header>
+
+      <div class="login-box-content">
+        <label class="form-group" for="username">
+          <span class="label-text">Username</span>
+          <input type="text" id="username" name="username" required autocomplete="username" />
+        </label>
+
+        <label class="form-group" for="password">
+          <span class="label-text">Password</span>
+          <input type="password" id="password" name="password" required autocomplete="current-password" />
+        </label>
+
+        <div class="login-actions">
+          <label class="remember">
+            <input type="checkbox" name="remember" /> Remember me
+          </label>
+          <button type="submit" class="btn">Sign in</button>
+        </div>
+
+        <p class="helper">
+          <a href="#" class="forgot">Forgot password?</a>
+        </p>
+      </div>
+    </form>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>&copy; 2024 DReview. All rights reserved. Team: Dauren Zhexhenov, Roman Kutbeyev </p>
+    </div>
+</body>
+</html>

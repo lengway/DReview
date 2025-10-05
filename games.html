@@ -10,125 +10,69 @@
 </head>
 
 <body id="games-page">
-  <div class="layout">
-    <header class="header">
-      <nav id="top-nav" class="navbar">
-        <div class="container nav-inner">
-          <a href="./home.html" class="brand-header"><img src="images/logo.png"></a>
-          <div class="nav-links">
-            <a href="./home.html" class="nav-link">Home</a>
-            <a href="./games.html" class="nav-link">Games</a>
-            <a href="./movies.html" class="nav-link">Movies</a>
-            <a href="./about.html" class="nav-link">About</a>
-            <a href="./imagegallery.html" class="nav-link">Image Gallery</a>
-            <a href="./login.html" class="nav-link nav-cta">Sign in</a>
-          </div>
+  <header class="header">
+    <nav id="top-nav" class="navbar">
+      <div class="container nav-inner">
+        <a href="./home.html" class="brand-header"><img src="images/logo.png"></a>
+        <div class="nav-links">
+          <a href="./home.html" class="nav-link">Home</a>
+          <a href="./games.html" class="nav-link">Games</a>
+          <a href="./movies.html" class="nav-link">Movies</a>
+          <a href="./about.html" class="nav-link">About</a>
+          <a href="./imagegallery.html" class="nav-link">Image Gallery</a>
+          <a href="./login.html" class="nav-link nav-cta">Sign in</a>
         </div>
-      </nav>
-    </header>
-
-    <aside class="sidebar">
-      <nav class="sidebar-nav">
-        <ul class="nav-list">
-          <li class="nav-item">
-            <a href="./home.html" class="nav-link" aria-current="page">
-              <span class="nav-text">Home</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="./games.html" class="nav-link">
-              <span class="nav-text">Games</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="./movies.html" class="nav-link">
-              <span class="nav-text">Movies</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="./about.html" class="nav-link">
-              <span class="nav-text">About</span>
-            </a>
-          </li>
-
-          <li class="nav-item nav-sep"></li>
-
-          <li class="nav-item">
-            <a href="./login.html" class="nav-link nav-cta">
-              <span class="nav-text">Sign in</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <div class="sidebar-footer">
-        <small class="sidebar-copy">DReview • Team: Dauren, Roman</small>
       </div>
-    </aside>
+    </nav>
+  </header>
 
-    <main class="main">
-      <header class="hero section">
-        <div class="container">
-          <h1 class="hero-title">Games</h1>
-          <p class="hero-subtitle">Explore trending titles and classics. Click any card to start your review on Home.
-          </p>
-        </div>
-      </header>
+  <section class="container my-5">
+  <h2 class="text-center mb-4">Top Rated Games</h2>
 
-      <section class="section">
-        <div class="container">
-          <div class="grid-2">
-            <article class="card">
-              <a href="reviews/games/eldenring.html">
-                <img src="images/eldenring.jpg" alt="Elden Ring" class="card-img" />
-                <div class="card-body">
-                  <h3 class="card-title">Elden Ring</h3>
-                  <p class="card-text">FromSoftware’s vast open-world action RPG.</p>
-                </div>
-              </a>
-            </article>
+  <div class="card-group">
 
-            <article class="card">
-              <a href="reviews/games/zelda.html">
-                <img src="images/zelda.jpg" alt="Zelda: Breath of the Wild" class="card-img" />
-                <div class="card-body">
-                  <h3 class="card-title">Zelda: BOTW</h3>
-                  <p class="card-text">Physics-driven exploration and freedom.</p>
-                </div>
-              </a>
-            </article>
-
-            <article class="card">
-              <a href="reviews/games/godofwar.html">
-                <img src="images/godofwar.jpg" alt="God of War" class="card-img" />
-                <div class="card-body">
-                  <h3 class="card-title">God of War</h3>
-                  <p class="card-text">Brutal combat meets heartfelt storytelling.</p>
-                </div>
-              </a>
-            </article>
-
-            <article class="card">
-              <a href="reviews/games/witcher3.html">
-                <img src="images/witcher3.jpg" alt="The Witcher 3" class="card-img" />
-                <div class="card-body">
-                  <h3 class="card-title">The Witcher 3</h3>
-                  <p class="card-text">Epic quests and rich characters in a vast world.</p>
-                </div>
-              </a>
-            </article>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-    <div class="container footer-inner">
-      <p>&copy; 2024 DReview. All rights reserved. Team: Dauren Zhexhenov, Roman Kutbeyev </p>
+    <div class="card">
+      <img src="images/eldenring.jpg" class="card-img-top" alt="Elden Ring">
+      <div class="card-body">
+        <h5 class="card-title">Elden Ring</h5>
+        <p class="card-text">Explore a vast open world filled with mystery, danger, and epic battles.</p>
+      </div>
+      <div class="card-footer text-center">
+        <a href="reviews/games/eldenring.html" class="btn btn-outline-warning">Read Review</a>
+      </div>
     </div>
+
+    <div class="card">
+      <img src="images/godofwar.jpg" class="card-img-top" alt="God of War">
+      <div class="card-body">
+        <h5 class="card-title">God of War</h5>
+        <p class="card-text">Follow Kratos and Atreus on a mythological journey filled with emotion and combat.</p>
+      </div>
+      <div class="card-footer text-center">
+        <a href="reviews/games/godofwar.html" class="btn btn-outline-danger">Read Review</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <img src="images/witcher3.jpg" class="card-img-top" alt="The Witcher 3">
+      <div class="card-body">
+        <h5 class="card-title">The Witcher 3: Wild Hunt</h5>
+        <p class="card-text">Step into the dark fantasy world of Geralt of Rivia with deep storytelling.</p>
+      </div>
+      <div class="card-footer text-center">
+        <a href="reviews/games/witcher3.html" class="btn btn-outline-primary">Read Review</a>
+      </div>
+    </div>
+
   </div>
+</section>
+
+
+    </div>
+  </section>
+
+
+
 </body>
 
 </html>

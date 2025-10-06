@@ -5,13 +5,13 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const form = document.querySelector('.login-box')
-const usernameInput = document.querySelector('#username')
-const passwordInput = document.querySelector('#password')
+const emailInput = document.querySelector('#email').value
+const passwordInput = document.querySelector('#password').value
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault() // предотвращаем перезагрузку страницы
 
-  const email = usernameInput.value.trim()
+  const email = emailInput.value.trim()
   const password = passwordInput.value.trim()
 
   if (!email || !password) {

@@ -1,28 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./css/style.css" />
   <link rel="icon" href="./images/logo.png" type="image/png">
   <title>DReview - Sign In</title>
 </head>
+
 <body id="login-page">
   <header class="header">
-    <nav id="top-nav" class="navbar">
-      <div class="container nav-inner">
-        <a href="./home.html" class="brand-header"><img src="images/logo.png"></a>
-        <div class="nav-links">
-          <a href="./home.html" class="nav-link">Home</a>
-          <a href="./games.html" class="nav-link">Games</a>
-          <a href="./movies.html" class="nav-link">Movies</a>
-          <a href="./about.html" class="nav-link">About</a>
-          <a href="./imagegallery.html" class="nav-link">Image Gallery</a>
-          <a href="./signin.html" class="nav-link nav-cta">Sign in</a>
-        </div>
-      </div>
-    </nav>
-  </header> 
+  </header>
 
 
   <main class="login-container" role="main">
@@ -35,11 +24,13 @@
         <label class="form-group" for="email">
           <span class="label-text">Your Email</span>
           <input type="text" id="email" name="email" required autocomplete="email" />
+          <span class="error" id="emailError">Wrong email</span>
         </label>
 
         <label class="form-group" for="password">
           <span class="label-text">Password</span>
           <input type="password" id="password" name="password" required autocomplete="current-password" />
+          <span class="error" id="passwordError">Wrong password</span>
         </label>
 
         <div class="login-actions">
@@ -51,18 +42,19 @@
 
         <p class="helper">
           <a href="#" class="forgot">Forgot password?</a>
+          <a href="singup.html" class="signup">Sign Up</a>
         </p>
       </div>
     </form>
   </main>
 
   <footer class="footer">
-    <div class="container footer-inner">
-      <p>&copy; 2024 DReview. All rights reserved. Team: Dauren Zhexhenov, Roman Kutbeyev </p>
-    </div>
   </footer>
 
   <!-- js -->
   <script type="module" src="./scripts/signin.js"></script>
+  <script src="./scripts/injector.js" defer></script>
+  <script src="./scripts/themeswitch.js" defer></script>
 </body>
+
 </html>

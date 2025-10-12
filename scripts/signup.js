@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const form = document.querySelector('.login-box');
 const emailInput = document.querySelector('#email');
 const passwordInput = document.querySelector('#password');
-const confirmPasswordInput = document.querySelector('#confirm-password'); // ✅ исправлено!
+const confirmPasswordInput = document.querySelector('#confirm-password');
 
 const emailError = document.querySelector('#emailError');
 const passwordError = document.querySelector('#passwordError');

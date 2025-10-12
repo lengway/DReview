@@ -35,19 +35,23 @@ emailInput.addEventListener('input', () => {
 
 // === PASSWORD VALIDATION ===
 passwordInput.addEventListener('input', () => {
-  passwordError.textContent = '';
-  passwordError.classList.remove('visible');
-  passwordInput.classList.remove('invalid');
+  const pwd = passwordInput.value;
+  if (!pwd) {
+    passwordError.textContent = '';
+    passwordError.classList.remove('visible');
+    passwordInput.classList.remove('invalid');
+  } else if (pwd.length < 8) {
+    passwordError.textContent = 'Password must be at least 8 characters';
+    passwordError.classList.add('visible');
+    passwordInput.classList.add('invalid');
+  } else {
+    passwordError.textContent = '';
+    passwordError.classList.remove('visible');
+    passwordInput.classList.remove('invalid');
+  }
 });
 
 // === CONFIRM PASSWORD VALIDATION ===
-confirmPasswordInput.addEventListener('input', () => {
-  confirmPasswordError.textContent = '';
-  confirmPasswordError.classList.remove('visible');
-  confirmPasswordInput.classList.remove('invalid');
-});
-
-// === FORM SUBMIT ===
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -64,6 +68,11 @@ form.addEventListener('submit', async (e) => {
   }
   if (!password) {
     passwordError.textContent = 'Enter password';
+    passwordError.classList.add('visible');
+    passwordInput.classList.add('invalid');
+    hasError = true;
+  } else if (password.length < 8) {
+    passwordError.textContent = 'Password must be at least 8 characters';
     passwordError.classList.add('visible');
     passwordInput.classList.add('invalid');
     hasError = true;

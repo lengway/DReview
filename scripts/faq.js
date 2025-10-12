@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const expanded = btn.getAttribute('aria-expanded') === 'true';
 
     if (accordion && !expanded) {
-      document.querySelectorAll('.faq-card__content.open').forEach((other) => {
+      document.querySelectorAll('.faq-card-content.open').forEach((other) => {
         if (other === content) return;
         const otherBtn = other.closest('.faq-card')?.querySelector('.faq-toggle');
         if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
@@ -53,16 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
       openFaq(content, btn);
     } else {
       closeFaq(content, btn);
-    }
-  });
-
-  // keyboard support: Enter / Space on toggle
-  document.addEventListener('keydown', (e) => {
-    const el = e.target;
-    if (!el.classList || !el.classList.contains('faq-toggle')) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      el.click();
     }
   });
 

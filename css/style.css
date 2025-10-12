@@ -256,11 +256,11 @@ h3 {
   color: var(--text);
   box-shadow: var(--shadow);
   /* transform: translateX(-20px); */
-  transform: translate3d(-16px, 4px, 0);
+  transform: translate3d(-16px, 0px, 0);
   transition: transform 220ms ease, background-color 220ms ease, color 220ms ease;
 }
 .theme-toggle[aria-pressed="true"] .icon {
-  transform: translate3d(15px, 4px, 0);
+  transform: translate3d(16px, 0px, 0);
 }
 .theme-toggle:hover {
   outline: none;

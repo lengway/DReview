@@ -294,6 +294,15 @@ h3 {
   margin: 0;
 }
 
+#time {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: var(--muted-plain, #dbe2ff);
+}
+
+
 /* NAV LIST in sidebar */
 .nav-list {
   list-style: none;
@@ -753,6 +762,82 @@ a {
   transform: translateY(-4px);
   box-shadow: var(--gallery-hover-shadow);
 }
+
+/* overlay & popup */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(2,6,23,0.9);
+  z-index: 9998;
+}
+
+/* visually hidden by attribute */
+.popup-overlay[hidden] { display: none; }
+
+.popup {
+  width: 100%;
+  max-width: 520px;
+  margin: 1.5rem;
+  background: linear-gradient(180deg, var(--loginbox-bg-start), var(--loginbox-bg-end));
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  padding: 1.25rem 1.25rem 1.5rem;
+  position: relative;
+  border: 1px solid var(--loginbox-border);
+  color: var(--text);
+  transform-origin: center;
+  animation: popup-appear .18s ease;
+}
+
+/* close button */
+.popup-close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  padding: 6px;
+  cursor: pointer;
+}
+
+/* header */
+.popup-header { margin-bottom: 6px; }
+.popup-sub { color: var(--muted); font-size: .95rem; margin-top: .25rem; }
+
+/* form */
+.popup-form .form-row { display:flex; flex-direction:column; gap:6px; margin-bottom: 12px; }
+.popup-form input[type="email"],
+.popup-form input[type="text"] {
+  padding: .65rem .75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  color: var(--text);
+}
+
+/* errors */
+.popup-form .error { color: #ff6b6b; font-size: .85rem; min-height: 18px; }
+
+/* actions */
+.popup-actions { display:flex; gap:.5rem; justify-content:flex-end; margin-top:6px; }
+.btn-ghost { background: transparent; border: 1px solid var(--overlay-3); color: var(--muted); }
+
+/* simple appear animation */
+@keyframes popup-appear {
+  from { transform: translateY(6px) scale(.995); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* mobile tweaks */
+@media (max-width: 520px) {
+  .popup { padding: 1rem; margin: 1rem; }
+  .popup-actions { flex-direction: column-reverse; gap: .5rem; }
+}
+
 
 /* FOOTER */
 .footer {

@@ -23,6 +23,7 @@
         <div class="container">
           <h1 class="hero-title">About DReview</h1>
           <p class="hero-subtitle">A simple service by Dauren & Roman to publish clean reviews for games and movies.</p>
+          <button id="open-subscribe" class="btn">Subscribe</button>
         </div>
       </header>
 
@@ -68,8 +69,38 @@
     </footer>
   </div>
 
+  <div id="popup-overlay" class="popup-overlay" hidden aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" tabindex="-1">
+      <button class="popup-close" aria-label="Close">✕</button>
+
+      <header class="popup-header">
+        <h2 id="popup-title">Subscribe to DReview</h2>
+        <p class="popup-sub">Get updates about new reviews and features</p>
+      </header>
+
+      <form id="popup-form" class="popup-form" novalidate>
+        <label class="form-row">
+          <span class="label-text">Your email</span>
+          <input type="email" id="popup-email" name="email" required placeholder="you@example.com" />
+          <span class="error" id="popup-email-error" aria-live="polite"></span>
+        </label>
+
+        <label class="form-row">
+          <span class="label-text">Name (optional)</span>
+          <input type="text" id="popup-name" name="name" placeholder="Your name" />
+        </label>
+
+        <div class="popup-actions">
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+          <button type="button" class="btn btn-ghost popup-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="./scripts/injector.js" defer></script>
   <script src="./scripts/themeswitch.js" defer></script>
+  <script src="./scripts/popup.js" defer></script>
 </body>
 
 </html>

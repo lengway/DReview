@@ -35,5 +35,45 @@
 </nav>
 
 <div class="sidebar-footer">
+    <div class="sidebar-copy" id="time">--</div>
     <small class="sidebar-copy">DReview • Team: Dauren, Roman</small>
 </div>
+
+<script>
+    (function () {
+        const el = document.getElementById('time');
+        if (!el) {
+            console.error('Time element not found');
+            return;
+        }
+
+        // make sure it's visible (вдруг стиль прячeт)
+        try {
+            const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--muted') || '';
+            if (cssColor) el.style.color = cssColor.trim();
+        } catch (e) { /* ignore */ }
+        el.style.fontWeight = '600';
+        el.style.fontSize = '0.95rem';
+        el.style.display = 'block';
+
+        function fmt(d) {
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            const ss = String(d.getSeconds()).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const MM = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return hh + ':' + mm + ':' + ss + ' ' + dd + '.' + MM + '.' + yyyy;
+        }
+
+        // set immediately (без задержки)
+        el.textContent = fmt(new Date());
+
+        // обновляем каждую секунду — если не хочешь обновлять, удали setInterval
+        const timer = setInterval(() => {
+            // safety: если элемент исчез — останавливаем таймер
+            if (!document.contains(el)) { clearInterval(timer); return; }
+            el.textContent = fmt(new Date());
+        }, 1000);
+    })();
+</script>

@@ -602,6 +602,17 @@ h3 {
   transition: transform 320ms ease;
 }
 
+body.light .faq-toggle-icon {
+  width: 20px;
+  height: 20px;
+  /* margin-left: 8px; */
+  margin-top: 6px;
+  filter: sepia(8%) saturate(747%) hue-rotate(169deg) contrast(89%);
+  transform: rotate(0deg);
+  transform-origin: center;
+  transition: transform 320ms ease;
+}
+
 .faq-toggle[aria-expanded="true"] .faq-toggle-icon {
   transform: rotate(180deg);
 }

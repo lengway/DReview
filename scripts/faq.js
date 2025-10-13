@@ -14,16 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     toggle.setAttribute('aria-controls', content.id);
-
-    if (content.classList.contains('open')) {
-      toggle.setAttribute('aria-expanded', 'true');
-      content.setAttribute('aria-hidden', 'false');
-      content.style.height = 'auto';
-    } else {
-      toggle.setAttribute('aria-expanded', 'false');
-      content.setAttribute('aria-hidden', 'true');
-      content.style.height = '0px';
-    }
   });
 
   document.addEventListener('click', (e) => {
@@ -92,12 +82,5 @@ document.addEventListener('DOMContentLoaded', () => {
       contentEl.removeEventListener('transitionend', onEnd);
     };
     contentEl.addEventListener('transitionend', onEnd);
-  }
-
-  function collapseHeight(el) {
-    const cur = el.scrollHeight;
-    el.style.height = cur + 'px';
-    el.offsetHeight;
-    el.style.height = '0px';
   }
 });

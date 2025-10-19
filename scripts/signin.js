@@ -5,7 +5,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // элементы
-const form = document.querySelector('.login-box')
+const form = document.querySelector('.login-box') // add semicolons
 const emailInput = document.querySelector('#email')
 const passwordInput = document.querySelector('#password')
 

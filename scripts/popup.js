@@ -1,3 +1,5 @@
+import { playSound } from "./sound.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const openBtn = document.getElementById('open-subscribe');
     const overlay = document.getElementById('popup-overlay');
@@ -79,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         showLocalToast('🎉 Subscribed! Check your email — confirmation sent.', 'success');
+        playSound();
 
         setTimeout(() => closePopup(), 900);
     });

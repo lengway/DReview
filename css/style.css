@@ -446,6 +446,10 @@ h3 {
   background: linear-gradient(180deg, var(--btn-hover-bg-start), var(--btn-hover-bg-end));
 }
 
+#review-page .btn:hover {
+  transform: none;
+}
+
 .review-row {
   display: flex;
   gap: 1.5rem;
@@ -535,6 +539,10 @@ h3 {
   transition: transform .18s ease, box-shadow .18s ease;
   padding: 1rem;
   padding-bottom: 1.5rem;
+}
+
+#review-page .card {
+  background:#141a2f
 }
 
 .card-text {

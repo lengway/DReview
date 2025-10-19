@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "@google-cloud/translate": "^9.2.1",
+    "cheerio": "^1.1.2",
+    "express": "^5.1.0",
+    "fs-extra": "^11.3.2",
+    "i18next": "^25.6.0",
+    "node-fetch": "^3.3.2"
+  },
+  "name": "dreview",
+  "version": "1.0.0",
+  "description": "DReview - is the simpliest way to acknowledge new things about games and movies. With this service you can give your persnonally review about new games and movies and discover something new about media you have never experienced.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lengway/DReview.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lengway/DReview/issues"
+  },
+  "homepage": "https://github.com/lengway/DReview#readme"
+}

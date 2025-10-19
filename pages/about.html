@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DReview — About</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="icon" href="../images/logo.png" type="image/png">
+</head>
+
+<body id="about-page">
+  <div class="layout">
+    <header class="header">
+    </header>
+
+    <aside class="sidebar">
+    </aside>
+
+
+    <main class="main">
+      <header class="hero section">
+        <div class="container">
+          <h1 class="hero-title">About DReview</h1>
+          <p class="hero-subtitle">A simple service by Dauren & Roman to publish clean reviews for games and movies.</p>
+          <button id="open-subscribe" class="btn">Subscribe</button>
+        </div>
+      </header>
+
+      <section class="section">
+        <div class="container">
+          <h2 class="section-title">Our Mission</h2>
+          <p class="hero-subtitle">
+            DReview helps you share honest impressions without noise. We keep the layout clean,
+            typography readable, and interactions minimal — so your words matter the most.
+          </p>
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container">
+          <h2 class="section-title">Team</h2>
+          <div class="grid-2">
+            <article class="card">
+              <div class="card-body" style="display:flex;align-items:center;gap:.9rem;">
+                <img class="img-circle" src="../images/dauren.jpg" alt="Portrait of Dauren" />
+                <div>
+                  <h3 class="card-title">Dauren</h3>
+                  <p class="card-text">Co-founder, ideas and UX flow.</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-body" style="display:flex;align-items:center;gap:.9rem;">
+                <img class="img-circle" src="../images/roman.jpg" alt="Portrait of Roman" />
+                <div>
+                  <h3 class="card-title">Roman</h3>
+                  <p class="card-text">Co-founder, structure and details.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+    </footer>
+  </div>
+
+  <div id="popup-overlay" class="popup-overlay" hidden aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" tabindex="-1">
+      <button class="popup-close" aria-label="Close">✕</button>
+
+      <header class="popup-header">
+        <h2 id="popup-title">Subscribe to DReview</h2>
+        <p class="popup-sub">Get updates about new reviews and features</p>
+      </header>
+
+      <form id="popup-form" class="popup-form" novalidate>
+        <label class="form-row">
+          <span class="label-text">Your email</span>
+          <input type="email" id="popup-email" name="email" required placeholder="you@example.com" />
+          <span class="error" id="popup-email-error" aria-live="polite"></span>
+        </label>
+
+        <label class="form-row">
+          <span class="label-text">Name (optional)</span>
+          <input type="text" id="popup-name" name="name" placeholder="Your name" />
+        </label>
+
+        <div class="popup-actions">
+          <button type="submit" class="btn btn-primary">Subscribe</button>
+          <button type="button" class="btn btn-ghost popup-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../scripts/injector.js" defer></script>
+  <script src="../scripts/themeswitch.js" defer></script>
+  <script type="module" src="../scripts/popup.js" defer></script>
+</body>
+
+</html>

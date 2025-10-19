@@ -1,0 +1,114 @@
+<nav class="sidebar-nav">
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="./home.html" class="nav-link">
+                <span class="nav-text">Home</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="./games.html" class="nav-link">
+                <span class="nav-text">Games</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="./movies.html" class="nav-link">
+                <span class="nav-text">Movies</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="./about.html" class="nav-link">
+                <span class="nav-text">About</span>
+            </a>
+        </li>
+
+        <li class="nav-item nav-sep"></li>
+
+        <li class="nav-item">
+            <a href="./login.html" class="nav-link nav-cta">
+                <span class="nav-text">Sign in</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<div class="sidebar-footer">
+    <div id="greeting">--</div>
+    <div class="sidebar-copy" id="time">--</div>
+    <small class="sidebar-copy">DReview • Team: Dauren, Roman</small>
+</div>
+
+<script>
+    (function () {
+        const el = document.getElementById('time');
+        const gr = document.getElementById('greeting');
+        if (!el) {
+            console.error('Time element not found');
+            return;
+        }
+
+        try {
+            const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--muted') || '';
+            if (cssColor) el.style.color = cssColor.trim();
+        } catch (e) { }
+        el.style.fontWeight = '600';
+        el.style.fontSize = '0.95rem';
+        el.style.display = 'block';
+
+        function fmt(d) {
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            const ss = String(d.getSeconds()).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const MM = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = String(d.getYear() - 100);
+            return hh + ':' + mm + ':' + ss + ' ' + dd + '.' + MM + '.' + yyyy;
+        }
+
+        el.textContent = fmt(new Date());
+
+        // обновляем каждую секунду
+        const timer = setInterval(() => {
+            if (!document.contains(el)) { clearInterval(timer); return; }
+            el.textContent = fmt(new Date());
+            switch (parseInt(el.textContent.substring(0,3))) {
+                case 23:
+                case 24:
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    gr.textContent = 'You probably should go to sleep. Good night!'
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    gr.textContent = 'Good morning! Write your best review.'
+                    break;
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                    gr.textContent = 'Good afternoon!'
+                    break;
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                    gr.textContent = 'Good evening! Do not forget to go sleep.'
+                    break;
+
+            }
+        }, 1000);
+    })();
+</script>

@@ -1,4 +1,5 @@
 document.addEventListener('keydown', function(event) {
+
   const currentElement = document.activeElement;
   let nextElement;
 

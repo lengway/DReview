@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   loadMoreBtn.addEventListener('click', loadMoreReviews);
 
-  // --- Функции ---
-
   function loadMoreReviews() {
     const reviewsToLoad = allReviews.slice(currentIndex, currentIndex + reviewsPerLoad);
     renderReviews(reviewsToLoad);
@@ -60,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p class="review-paragraph">
                     ${visibleText}<span class="more-text">${hiddenText}</span>
                 </p>
-                ${showReadMore ? `<button class="btn read-more-btn">Читать далее</button>` : ''}
+                ${showReadMore ? `<button class="btn read-more-btn">Read more</button>` : ''}
             </div>
           </div>
           <div class="rating">
@@ -75,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       reviewsList.insertAdjacentHTML('beforeend', reviewHTML);
 
-      // Анимация появления с задержкой
       const newReview = reviewsList.lastElementChild;
       setTimeout(() => {
         newReview.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
@@ -104,20 +101,19 @@ document.addEventListener('DOMContentLoaded', function () {
           if (!isExpanded) {
             moreText.style.display = 'inline';
 
-            // Небольшая задержка чтобы CSS transitions сработали
             setTimeout(() => {
               moreText.classList.add('expanded');
             }, 10);
             // Раскрываем
-            e.target.textContent = 'Скрыть';
+            e.target.textContent = 'Hide';
           } else {
             // Скрываем
             moreText.classList.remove('expanded');
-            e.target.textContent = 'Читать далее';
+            e.target.textContent = 'Read more';
 
             setTimeout(() => {
               moreText.style.display = 'none';
-            }, 100); // 600ms = длительность вашей transition
+            }, 100);
           }
         }
       });

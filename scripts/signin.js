@@ -9,7 +9,7 @@ const form = document.querySelector('.login-box') // add semicolons
 const emailInput = document.querySelector('#email')
 const passwordInput = document.querySelector('#password')
 
-// элементы для ошибок (добавь их в html)
+// элементы для ошибок
 const emailError = document.querySelector('#emailError')
 const passwordError = document.querySelector('#passwordError')
 

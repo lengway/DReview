@@ -69,7 +69,6 @@
 
         el.textContent = fmt(new Date());
 
-        // обновляем каждую секунду
         const timer = setInterval(() => {
             if (!document.contains(el)) { clearInterval(timer); return; }
             el.textContent = fmt(new Date());

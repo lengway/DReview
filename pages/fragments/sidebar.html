@@ -49,65 +49,166 @@
             return;
         }
 
+        // Стили для анимации (если ещё не добавлены в CSS, добавим динамически)
+        (function injectStyles() {
+            if (document.getElementById('sidebar-clock-anim-style')) return;
+            const css = `
+      .clock-counting { 
+        display: inline-block;
+        transition: transform 0.28s ease, letter-spacing 0.28s ease;
+        transform-origin: center;
+      }
+      .clock-pulse {
+        transform: scale(1.06);
+        letter-spacing: 0.6px;
+      }
+    `;
+            const s = document.createElement('style');
+            s.id = 'sidebar-clock-anim-style';
+            s.appendChild(document.createTextNode(css));
+            document.head.appendChild(s);
+        })();
+
+        // Берём CSS-переменную --muted если есть
         try {
             const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--muted') || '';
             if (cssColor) el.style.color = cssColor.trim();
-        } catch (e) { }
+        } catch (e) { /* ignore */ }
+
         el.style.fontWeight = '600';
         el.style.fontSize = '0.95rem';
         el.style.display = 'block';
 
-        function fmt(d) {
+        // форматирование времени (как у тебя)
+        function fmtDateObj(d) {
             const hh = String(d.getHours()).padStart(2, '0');
             const mm = String(d.getMinutes()).padStart(2, '0');
             const ss = String(d.getSeconds()).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
             const MM = String(d.getMonth() + 1).padStart(2, '0');
             const yyyy = String(d.getYear() - 100);
-            return hh + ':' + mm + ':' + ss + ' ' + dd + '.' + MM + '.' + yyyy;
+            return { hh, mm, ss, dd, MM, yyyy };
+        }
+        function renderParts(parts) {
+            // собираем HTML с обёртками для анимации
+            return `<span class="clock-counting">${parts.hh}</span>:<span class="clock-counting">${parts.mm}</span>:<span class="clock-counting">${parts.ss}</span> ${parts.dd}.${parts.MM}.${parts.yyyy}`;
         }
 
-        el.textContent = fmt(new Date());
+        // Показываем сразу текущее время (без анимации) — чтобы место занялось
+        const now = new Date();
+        el.innerHTML = renderParts(fmtDateObj(now));
 
-        const timer = setInterval(() => {
-            if (!document.contains(el)) { clearInterval(timer); return; }
-            el.textContent = fmt(new Date());
-            switch (parseInt(el.textContent.substring(0,3))) {
-                case 23:
-                case 24:
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                    gr.textContent = 'You probably should go to sleep. Good night!'
-                    break;
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                    gr.textContent = 'Good morning! Write your best review.'
-                    break;
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                    gr.textContent = 'Good afternoon!'
-                    break;
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                    gr.textContent = 'Good evening! Do not forget to go sleep.'
-                    break;
-
+        // функция обновления greet текст — почти копия твоей логики, только без parseInt странностей
+        function updateGreetingByHour(h) {
+            if (!gr) return;
+            if (h >= 23 || h <= 5) {
+                gr.textContent = 'You probably should go to sleep. Good night!';
+            } else if (h >= 6 && h <= 11) {
+                gr.textContent = 'Good morning! Write your best review.';
+            } else if (h >= 12 && h <= 17) {
+                gr.textContent = 'Good afternoon!';
+            } else {
+                gr.textContent = 'Good evening! Do not forget to go sleep.';
             }
-        }, 1000);
+        }
+        updateGreetingByHour(now.getHours());
+
+        // ========== АНИМАЦИЯ ПРИ ВОХОДЕ В ВИДИМОСТЬ ==========
+        // цель: плавно увеличить каждую часть (hh, mm, ss) от 0 до текущего значения
+        // затем переключиться на настоящий таймер.
+
+        let realtimeTimer = null;
+        function startRealtimeTimer() {
+            if (realtimeTimer) return;
+            realtimeTimer = setInterval(() => {
+                const d = new Date();
+                el.innerHTML = renderParts(fmtDateObj(d));
+                updateGreetingByHour(d.getHours());
+            }, 1000);
+        }
+
+        function stopRealtimeTimer() {
+            if (realtimeTimer) {
+                clearInterval(realtimeTimer);
+                realtimeTimer = null;
+            }
+        }
+
+        // Анимация счётчика: отдельно для hh, mm, ss
+        function animateToCurrentDuration(duration = 1700) {
+            stopRealtimeTimer();
+
+            // Зафиксируем время при старте, чтобы не сдвигалось за секунду
+            const startFix = new Date();
+            const targetParts = fmtDateObj(startFix);
+
+            const targetH = parseInt(targetParts.hh, 10);
+            const targetM = parseInt(targetParts.mm, 10);
+            const targetS = parseInt(targetParts.ss, 10);
+
+            const startTime = performance.now();
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+            function step(nowTime) {
+                const elapsed = nowTime - startTime;
+                const t = Math.min(1, elapsed / duration);
+                const ease = easeOutCubic(t);
+
+                const curH = Math.floor(targetH * ease);
+                const curM = Math.floor(targetM * ease);
+                const curS = Math.floor(targetS * ease);
+
+                const parts = {
+                    hh: String(curH).padStart(2, '0'),
+                    mm: String(curM).padStart(2, '0'),
+                    ss: String(curS).padStart(2, '0'),
+                    dd: targetParts.dd,
+                    MM: targetParts.MM,
+                    yyyy: targetParts.yyyy
+                };
+                el.innerHTML = renderParts(parts);
+                el.querySelectorAll('.clock-counting').forEach(sp => sp.classList.add('clock-pulse'));
+
+                if (t < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    // после завершения берём *новое* время (уже актуальное)
+                    const finalParts = fmtDateObj(new Date());
+                    el.innerHTML = renderParts(finalParts);
+                    setTimeout(() => {
+                        el.querySelectorAll('.clock-counting').forEach(sp => sp.classList.remove('clock-pulse'));
+                    }, 120);
+                    setTimeout(startRealtimeTimer, 220);
+                }
+            }
+
+            requestAnimationFrame(step);
+        }
+
+
+        // Запускаем анимацию только когда элемент впервые станет видимым (IntersectionObserver)
+        let animationTriggered = false;
+        const io = new IntersectionObserver((entries) => {
+            for (const ent of entries) {
+                if (ent.isIntersecting && !animationTriggered) {
+                    animationTriggered = true;
+                    // длительность 1600..2000 ms в зависимости от высоты вьюпорта
+                    const dur = 2000 - Math.min(window.innerHeight, 800) * 1.5;
+                    animateToCurrentDuration(dur);
+                }
+            }
+        }, { root: null, threshold: 0.1 });
+
+        io.observe(el);
+
+        // На случай если IntersectionObserver не поддерживается — запустим сразу
+        if (!('IntersectionObserver' in window)) {
+            animateToCurrentDuration(1700);
+        }
+
+        // Если пользователь покинул страницу или элемент удалён — чистим таймеры
+        window.addEventListener('pagehide', () => stopRealtimeTimer());
+        window.addEventListener('beforeunload', () => stopRealtimeTimer());
+
     })();
 </script>

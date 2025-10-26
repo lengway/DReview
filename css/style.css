@@ -137,6 +137,20 @@ body.light::after {
   opacity: 1;
 }
 
+/* Прогресс-бар прокрутки */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 0;
+  background: linear-gradient(90deg, var(--text), var(--muted));
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(255, 153, 0, 0.4);
+  transition: width 0.1s linear;
+}
+
+
 img {
   display: block;
   border-radius: 8px;
@@ -145,6 +159,22 @@ img {
   object-fit: cover;
   margin-bottom: 8px;
 }
+
+/* lazy loading fade-in */
+.card-img.lazy {
+  opacity: 0;
+  transform: scale(1.01);
+  transition: opacity .45s ease, transform .45s ease;
+  will-change: opacity, transform;
+  background: linear-gradient(90deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
+}
+
+/* when actual image loaded */
+.card-img.lazy.loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
 
 a {
   color: inherit;
@@ -643,6 +673,96 @@ body.light .faq-toggle-icon {
   opacity: 1;
 }
 
+/* Copy-to-clipboard button for FAQ answers */
+.faq-copy {
+  position: absolute;
+  right: 12px;
+  bottom: 10px; /* было top, теперь bottom */
+  background: var(--card);
+  border: 1px solid rgba(0,0,0,0.06);
+  color: var(--muted, #444);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  gap: .5rem;
+  align-items: center;
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, opacity .12s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+.faq-copy:hover {
+  background: rgba(0,0,0,0.03);
+}
+.faq-copy:active { transform: translateY(1px); }
+.faq-copy[disabled] { opacity: .6; cursor: default; pointer-events: none; }
+
+/* Icon in button */
+.faq-copy .icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Check animation */
+.faq-copy.success {
+  background: linear-gradient(90deg,#e6ffed,#ddffdf);
+  border-color: #b9f5c7;
+  color: #166534;
+}
+.faq-copy.success .icon {
+  transform: scale(1.0);
+  transition: transform .18s ease;
+}
+
+/* Tooltip small bubble (positioned above button) */
+.faq-copy-tooltip {
+  position: absolute;
+  right: 14px;
+  bottom: 44px; /* немного выше кнопки */
+  background: var(--card);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  transform: translateY(4px);
+}
+.faq-copy-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}.faq-copy-tooltip {
+  position: absolute;
+  right: 14px;
+  bottom: 44px; /* немного выше кнопки */
+  background: var(--card);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  transform: translateY(4px);
+}
+.faq-copy-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Container positioning: make faq-card-content relative so button can be absolute */
+.faq-card-content {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 2.2rem; /* добавим отступ снизу, чтобы текст не залезал под кнопку */
+}
+
+
 .visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -1009,4 +1129,28 @@ a {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* Spinner inside button */
+.btn-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+}
+.btn-spinner .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.12);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  flex: 0 0 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Disabled visual for button */
+.btn[disabled], button[disabled] {
+  opacity: 0.62;
+  cursor: not-allowed;
+  transform: none;
 }

@@ -6,10 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DReview — Movies</title>
   <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/search.css" />
   <link rel="icon" href="../images/logo.png" type="image/png">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body id="movies-page">
+  <div id="scroll-progress"></div>
   <div class="layout">
     <header class="header">
     </header>
@@ -24,6 +27,10 @@
           <p class="hero-subtitle">From indies to blockbusters. Discover and share your reviews.</p>
         </div>
       </header>
+
+      <div class="container">
+        <input type="text" id="search-bar" placeholder="Search movies" class="search-bar" />
+      </div>
 
       <section class="section">
         <div class="container">
@@ -76,6 +83,8 @@
     </footer>
   </div>
 
+  <script src="../scripts/lazyload.js" defer></script>
+  <script src="../scripts/search.js" defer></script>
   <script src="../scripts/keyboardNavigation.js"></script>
   <script src="../scripts/injector.js" defer></script>
   <script src="../scripts/themeswitch.js" defer></script>

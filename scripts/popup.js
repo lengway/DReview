@@ -81,41 +81,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- Spinner + disable UI ---
         const submitBtn = form.querySelector('button[type="submit"]');
         if (!submitBtn) {
-            // fallback: если нет кнопки — просто выполнить логику
             showLocalToast('🎉 Subscribed! Check your email — confirmation sent.', 'success');
             playSound();
             setTimeout(() => closePopup(), 900);
             return;
         }
 
-        // если уже отправляют — ничего не делаем
         if (submitBtn.disabled) return;
 
-        // Сохраним оригинальный HTML/text чтобы вернуть позже
         const origHTML = submitBtn.innerHTML;
         const origDisabledState = submitBtn.disabled;
 
-        // Блокируем поля и кнопку
         submitBtn.disabled = true;
         submitBtn.setAttribute('aria-busy', 'true');
         form.querySelectorAll('input,button,select,textarea').forEach(i => i.disabled = true);
 
-        // Показ спиннера и текста
         submitBtn.innerHTML = '<span class="btn-spinner"><span class="spinner" aria-hidden="true"></span><span class="spinner-text">Please wait…</span></span>';
 
-        // Симуляция запроса — через ~1700ms показываем тост и звук, затем закрываем попап
         const SIM_DELAY = 1700;
         setTimeout(() => {
-            // Тост и звук
             showLocalToast('🎉 Subscribed! Check your email — confirmation sent.', 'success');
             try { playSound(); } catch (err) { /* если sound.js не загрузился, молча продолжаем */ }
 
-            // Закрыть попап чуть позже, чтобы тост успел показаться
             setTimeout(() => {
-                // Восстанавливаем состояние (на случай, если попап не закроется)
                 if (submitBtn) {
                     submitBtn.innerHTML = origHTML;
                     submitBtn.disabled = origDisabledState;
@@ -129,9 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // тост в углу с уведомлением о подписке на рассылку
     function showLocalToast(msg, type = 'info') {
-        // если уже есть тост — убиваем, чтобы не дублировались
         $('.local-toast').remove();
 
         const $t = $('<div></div>')
@@ -154,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .appendTo('body');
 
-        // Плавное появление
         $t.animate({ opacity: 1, transform: 'translateX(0)' }, {
             duration: 200,
             step: function (now, fx) {
@@ -162,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Через 2 сек — исчезает
         setTimeout(() => {
             $t.animate({ opacity: 0, transform: 'translateX(20px)' }, {
                 duration: 300,

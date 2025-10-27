@@ -137,7 +137,6 @@ body.light::after {
   opacity: 1;
 }
 
-/* Прогресс-бар прокрутки */
 #scroll-progress {
   position: fixed;
   top: 0;
@@ -1131,7 +1130,6 @@ a {
   }
 }
 
-/* Spinner inside button */
 .btn-spinner {
   display: inline-flex;
   align-items: center;
@@ -1148,7 +1146,6 @@ a {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Disabled visual for button */
 .btn[disabled], button[disabled] {
   opacity: 0.62;
   cursor: not-allowed;

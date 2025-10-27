@@ -1,26 +1,14 @@
-// ../scripts/search.js
-// Unified search + suggestions script
-// Replaces previous version — declares globals, fixes scope issues, uses placeholder thumbs in suggestions
-
 $(document).ready(function () {
 
-  // -------------------
-  // Config / placeholders
-  // -------------------
   const PLACEHOLDER_THUMB = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // 1x1 transparent
   const MAX_SUGGESTIONS = 8;
 
-  // -------------------
-  // Elements & containers
-  // -------------------
   const $search = $('#search-bar');
-  if ($search.length === 0) return; // nothing to do
+  if ($search.length === 0) return;
 
-  // ensure wrapper/suggestions exist and are unique
   if (!$search.parent().hasClass('search-wrap')) {
     $search.wrap($('<div class="search-wrap" style="position:relative;display:block;max-width:760px;margin:0 auto;"></div>'));
   }
-  // create suggestion container (if not exists)
   let $suggest = $search.siblings('.search-suggestions');
   if ($suggest.length === 0) {
     $suggest = $(`
@@ -32,10 +20,7 @@ $(document).ready(function () {
   }
   const $slist = $suggest.find('ul');
 
-  // -------------------
-  // Collect card data
-  // -------------------
-  const $cards = $('.card'); // needed by filterCards
+  const $cards = $('.card');
   const items = []; // { title, text, thumb, href, $card }
 
   $cards.each(function () {
@@ -44,18 +29,13 @@ $(document).ready(function () {
     const href = $a.attr('href') || '#';
     const title = $card.find('.card-title').text().trim();
     const text = $card.find('.card-text').text().trim();
-    // prefer lazyloader's data-src (original image). fallback to src if data-src missing
     const $img = $card.find('img.card-img').first();
     const thumb = ($img.attr('data-src') || $img.attr('src') || '').trim();
     items.push({ title, text, thumb, href, $card });
   });
 
-  // titles set for older code compatibility (if needed)
   const titles = [...new Set(items.map(i => i.title))];
 
-  // -------------------
-  // Utilities
-  // -------------------
   function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
   function highlightTerm(text, term) {
@@ -64,15 +44,11 @@ $(document).ready(function () {
     return text.replace(re, '<mark class="search-highlight">$1</mark>');
   }
 
-  // -------------------
-  // Filtering cards
-  // -------------------
   function filterCards(query) {
     const q = (query || '').trim().toLowerCase();
 
     if (!q) {
       $cards.show();
-      // clear highlights
       items.forEach(it => {
         it.$card.find('.card-title').html(it.title);
         it.$card.find('.card-text').html(it.text);
@@ -86,12 +62,10 @@ $(document).ready(function () {
       const match = item.title.toLowerCase().includes(q) || item.text.toLowerCase().includes(q);
       item.$card.toggle(match);
       if (match) visibleCount++;
-      // highlight on cards
       item.$card.find('.card-title').html(highlightTerm(item.title, q));
       item.$card.find('.card-text').html(highlightTerm(item.text, q));
     });
 
-    // no-results
     $('.no-results').remove();
     if (visibleCount === 0) {
       const $no = $('<div class="no-results">No results found</div>');
@@ -99,9 +73,6 @@ $(document).ready(function () {
     }
   }
 
-  // -------------------
-  // Suggestions rendering (uses placeholder thumbnails)
-  // -------------------
   function renderSuggestions(rawQuery) {
     $slist.empty();
     $suggest.removeClass('open').attr('aria-hidden', 'true');
@@ -109,7 +80,6 @@ $(document).ready(function () {
     if (!rawQuery || rawQuery.trim().length === 0) return;
     const q = rawQuery.trim().toLowerCase();
 
-    // score and pick
     const matches = items
       .map(it => {
         const score = (it.title.toLowerCase().includes(q) ? 20 : 0) + (it.text.toLowerCase().includes(q) ? 6 : 0);
@@ -128,7 +98,6 @@ $(document).ready(function () {
     matches.forEach((m) => {
       const titleHtml = highlightTerm(m.title, q);
 
-      // snippet generation
       let snippet = m.text || '';
       const lower = snippet.toLowerCase();
       const pos = lower.indexOf(q);
@@ -142,8 +111,6 @@ $(document).ready(function () {
       }
       const snippetHtml = highlightTerm(snippet, q);
 
-      // build li — thumb uses placeholder intentionally
-      // prefer the real thumb when available, otherwise use placeholder
       const thumbSrc = m.thumb && m.thumb.length ? m.thumb : PLACEHOLDER_THUMB;
       const $li = $(`
         <li role="option" tabindex="-1" class="suggestion-item" data-href="${m.href}" data-title="${m.title}">
@@ -156,7 +123,6 @@ $(document).ready(function () {
         </li>
       `);
 
-      // click behavior — populate input and filter, don't navigate
       $li.on('click', function (e) {
         e.preventDefault();
         const title = $(this).data('title') || '';
@@ -172,9 +138,6 @@ $(document).ready(function () {
     $suggest.addClass('open').attr('aria-hidden', 'false');
   }
 
-  // -------------------
-  // Keyboard navigation (single handler)
-  // -------------------
   let activeIndex = -1;
   function resetActive() { activeIndex = -1; $slist.find('li').removeClass('active'); }
 
@@ -200,7 +163,6 @@ $(document).ready(function () {
         e.preventDefault();
         $active.trigger('click');
       } else {
-        // no active — do normal filter
         const val = $search.val();
         if (typeof filterCards === 'function') filterCards(val);
       }
@@ -215,9 +177,6 @@ $(document).ready(function () {
     }
   });
 
-  // -------------------
-  // Events: input debounce, click outside, resize
-  // -------------------
   let inputTimer = null;
   $search.on('input', function () {
     const q = $(this).val();
@@ -241,9 +200,6 @@ $(document).ready(function () {
     resetActive();
   });
 
-  // -------------------
-  // Init: show all cards (clear highlights)
-  // -------------------
   filterCards('');
 
 });

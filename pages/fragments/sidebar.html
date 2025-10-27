@@ -49,7 +49,6 @@
             return;
         }
 
-        // Стили для анимации (если ещё не добавлены в CSS, добавим динамически)
         (function injectStyles() {
             if (document.getElementById('sidebar-clock-anim-style')) return;
             const css = `
@@ -69,7 +68,6 @@
             document.head.appendChild(s);
         })();
 
-        // Берём CSS-переменную --muted если есть
         try {
             const cssColor = getComputedStyle(document.documentElement).getPropertyValue('--muted') || '';
             if (cssColor) el.style.color = cssColor.trim();
@@ -79,7 +77,6 @@
         el.style.fontSize = '0.95rem';
         el.style.display = 'block';
 
-        // форматирование времени (как у тебя)
         function fmtDateObj(d) {
             const hh = String(d.getHours()).padStart(2, '0');
             const mm = String(d.getMinutes()).padStart(2, '0');
@@ -90,15 +87,12 @@
             return { hh, mm, ss, dd, MM, yyyy };
         }
         function renderParts(parts) {
-            // собираем HTML с обёртками для анимации
             return `<span class="clock-counting">${parts.hh}</span>:<span class="clock-counting">${parts.mm}</span>:<span class="clock-counting">${parts.ss}</span> ${parts.dd}.${parts.MM}.${parts.yyyy}`;
         }
 
-        // Показываем сразу текущее время (без анимации) — чтобы место занялось
         const now = new Date();
         el.innerHTML = renderParts(fmtDateObj(now));
 
-        // функция обновления greet текст — почти копия твоей логики, только без parseInt странностей
         function updateGreetingByHour(h) {
             if (!gr) return;
             if (h >= 23 || h <= 5) {
@@ -112,10 +106,6 @@
             }
         }
         updateGreetingByHour(now.getHours());
-
-        // ========== АНИМАЦИЯ ПРИ ВОХОДЕ В ВИДИМОСТЬ ==========
-        // цель: плавно увеличить каждую часть (hh, mm, ss) от 0 до текущего значения
-        // затем переключиться на настоящий таймер.
 
         let realtimeTimer = null;
         function startRealtimeTimer() {
@@ -134,11 +124,9 @@
             }
         }
 
-        // Анимация счётчика: отдельно для hh, mm, ss
         function animateToCurrentDuration(duration = 1700) {
             stopRealtimeTimer();
 
-            // Зафиксируем время при старте, чтобы не сдвигалось за секунду
             const startFix = new Date();
             const targetParts = fmtDateObj(startFix);
 
@@ -172,7 +160,6 @@
                 if (t < 1) {
                     requestAnimationFrame(step);
                 } else {
-                    // после завершения берём *новое* время (уже актуальное)
                     const finalParts = fmtDateObj(new Date());
                     el.innerHTML = renderParts(finalParts);
                     setTimeout(() => {
@@ -186,13 +173,11 @@
         }
 
 
-        // Запускаем анимацию только когда элемент впервые станет видимым (IntersectionObserver)
         let animationTriggered = false;
         const io = new IntersectionObserver((entries) => {
             for (const ent of entries) {
                 if (ent.isIntersecting && !animationTriggered) {
                     animationTriggered = true;
-                    // длительность 1600..2000 ms в зависимости от высоты вьюпорта
                     const dur = 2000 - Math.min(window.innerHeight, 800) * 1.5;
                     animateToCurrentDuration(dur);
                 }
@@ -201,12 +186,10 @@
 
         io.observe(el);
 
-        // На случай если IntersectionObserver не поддерживается — запустим сразу
         if (!('IntersectionObserver' in window)) {
             animateToCurrentDuration(1700);
         }
 
-        // Если пользователь покинул страницу или элемент удалён — чистим таймеры
         window.addEventListener('pagehide', () => stopRealtimeTimer());
         window.addEventListener('beforeunload', () => stopRealtimeTimer());
 

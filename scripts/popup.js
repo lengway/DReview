@@ -131,27 +131,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // тост в углу с уведомлением о подписке на рассылку
     function showLocalToast(msg, type = 'info') {
-        if (typeof showToast === 'function') { showToast(msg, type); return; }
+        // если уже есть тост — убиваем, чтобы не дублировались
+        $('.local-toast').remove();
 
-        const t = document.createElement('div');
-        t.textContent = msg;
-        t.style.position = 'fixed';
-        t.style.right = '20px';
-        t.style.top = '20px';
-        t.style.padding = '10px 14px';
-        t.style.background = 'var(--card)';
-        t.style.border = '1px solid var(--overlay-3)';
-        t.style.borderLeft = '4px solid var(--accent)';
-        t.style.color = 'var(--text)';
-        t.style.borderRadius = '10px';
-        t.style.boxShadow = 'var(--shadow)';
-        t.style.zIndex = 9999;
-        document.body.appendChild(t);
+        const $t = $('<div></div>')
+            .addClass('local-toast')
+            .text(msg)
+            .css({
+                position: 'fixed',
+                right: '20px',
+                top: '20px',
+                padding: '10px 14px',
+                background: 'var(--card)',
+                border: '1px solid var(--overlay-3)',
+                'border-left': '4px solid var(--accent)',
+                color: 'var(--text)',
+                'border-radius': '10px',
+                'box-shadow': 'var(--shadow)',
+                'z-index': 9999,
+                opacity: 0,
+                transform: 'translateX(20px)'
+            })
+            .appendTo('body');
+
+        // Плавное появление
+        $t.animate({ opacity: 1, transform: 'translateX(0)' }, {
+            duration: 200,
+            step: function (now, fx) {
+                if (fx.prop === 'transform') $(this).css('transform', `translateX(${20 - now * 20}px)`);
+            }
+        });
+
+        // Через 2 сек — исчезает
         setTimeout(() => {
-            t.style.transition = 'opacity .3s ease, transform .3s ease';
-            t.style.opacity = '0';
-            t.style.transform = 'translateX(20px)';
-            setTimeout(() => t.remove(), 400);
+            $t.animate({ opacity: 0, transform: 'translateX(20px)' }, {
+                duration: 300,
+                step: function (now, fx) {
+                    if (fx.prop === 'transform') $(this).css('transform', `translateX(${now * 20}px)`);
+                },
+                complete: () => $t.remove()
+            });
         }, 2000);
     }
 });

@@ -1,8 +1,12 @@
 (function(){
+  // Определяем уровень вложенности папки относительно root
+  const depth = window.location.pathname.split('/').length - 2;
+  const basePath = depth > 1 ? '../'.repeat(depth - 1) : '';
+  
   const fragments = {
-    '.header': 'fragments/header.html',
-    '.sidebar': 'fragments/sidebar.html',
-    '.footer': 'fragments/footer.html',
+    '.header': `${basePath}fragments/header.html`,
+    '.sidebar': `${basePath}fragments/sidebar.html`,
+    '.footer': `${basePath}fragments/footer.html`,
   };
 
   for (const [selector, src] of Object.entries(fragments)) {

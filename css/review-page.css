@@ -1,3 +1,19 @@
+.review-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid var(--review-border);
+  border-radius: 8px;
+  background: var(--review-bg);
+  color: var(--text);
+}
+
+.review-item .avatar {
+  flex: 0 0 72px;
+}
+
 .more-text {
   display: none;
   max-height: 0;

@@ -85,9 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// === Copy-to-clipboard for FAQ answers ===
 (function () {
-  // Helper: small toast if tooltip can't show
   function localToast(msg) {
     const t = document.createElement('div');
     t.textContent = msg;
@@ -111,12 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1400);
   }
 
-  // Create buttons next to each answer
   document.querySelectorAll('.faq-card-content').forEach((content) => {
-    // avoid duplicates
     if (content.querySelector('.faq-copy')) return;
 
-    // create wrapper for tooltip + button
     const tooltip = document.createElement('div');
     tooltip.className = 'faq-copy-tooltip';
     tooltip.setAttribute('aria-hidden', 'true');
@@ -129,12 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.innerHTML = '<span class="text">Copy</span>';
     btn.title = 'Copy answer';
 
-    // position tooltip relative to content
     content.style.position = content.style.position || 'relative';
     content.appendChild(tooltip);
     content.appendChild(btn);
 
-    // Find the actual text to copy (prefer inner text of .faq-card-content-inner)
     const inner = content.querySelector('.faq-card-content-inner') || content;
 
     let timeoutId = null;
@@ -147,10 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // disable button briefly to prevent spam
       btn.disabled = true;
 
-      // try Clipboard API
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(text);
@@ -166,22 +157,18 @@ document.addEventListener('DOMContentLoaded', () => {
           ta.remove();
         }
 
-        // visual success: change icon->check, color, tooltip
         btn.classList.add('success');
         btn.querySelector('.text').textContent = 'Copied';
 
-        // show tooltip
         tooltip.classList.add('show');
         tooltip.setAttribute('aria-hidden', 'false');
 
-        // clear previous timeout
         if (timeoutId) clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           tooltip.classList.remove('show');
           tooltip.setAttribute('aria-hidden', 'true');
         }, 1200);
 
-        // restore button after short delay
         setTimeout(() => {
           btn.classList.remove('success');
           if (btn.querySelector('.icon')) btn.querySelector('.icon').textContent = '📋';

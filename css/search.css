@@ -1,4 +1,3 @@
-/* ---------- Стиль красивого dropdown-поиска ---------- */
 .search-suggestions {
   position: absolute;
   left: 50%;
@@ -12,18 +11,16 @@
   z-index: 1200;
   margin-top: 10px;
   border: 1px solid rgba(16,24,40,0.06);
-  display: none; /* показываем через JS */
+  display: none;
   transition: opacity 160ms ease, transform 160ms ease;
 }
 
-/* вид (плавно появление) */
 .search-suggestions.open {
   display: block;
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
-/* список */
 .search-suggestions ul {
   list-style: none;
   margin: 0;
@@ -32,7 +29,6 @@
   overflow-y: auto;
 }
 
-/* элемент подсказки */
 .search-suggestions li {
   display: flex;
   gap: 12px;
@@ -43,7 +39,6 @@
   transition: background 140ms ease, transform 120ms ease;
 }
 
-/* миниатюра */
 .search-suggestions .thumb {
   width: 72px;
   height: 44px;
@@ -53,7 +48,6 @@
   box-shadow: 0 6px 18px rgba(2,6,23,0.06);
 }
 
-/* текстовая часть */
 .search-suggestions .meta {
   flex: 1 1 auto;
   min-width: 0;
@@ -77,30 +71,26 @@
   text-overflow: ellipsis;
 }
 
-/* hover / active */
 .search-suggestions li:hover,
 .search-suggestions li.active {
   background: linear-gradient(90deg, rgba(250, 240, 210, 0.35), rgba(255,255,255,0.04));
   transform: translateY(-1px);
 }
 
-/* иконка справа (например, стрелка или ссылка) */
 .search-suggestions .go {
   flex: 0 0 28px;
   color: var(--accent);
   font-size: 14px;
 }
 
-/* подчёркивание совпадения */
-.search-suggestions mark {
-  background: linear-gradient(90deg,#232d3f,#1b2e66);
+mark {
+  background: linear-gradient(90deg,#9daac1,#717c9f);
   color: inherit;
   padding: 0 0px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-weight: 700;
 }
 
-/* "нет результатов" */
 .search-suggestions .empty {
   padding: 22px;
   color: #64748b;
@@ -108,6 +98,10 @@
   font-style: italic;
 }
 
-/* позиционирование по отношению к инпуту:
-   если у тебя инпут в .container, то JS сам вставит контейнер рядом.
-   Но можно скорректировать ширину/лево через CSS при желании */
+.serach-highlight {
+  background-color: linear-gradient(90deg,#232d3f,#1b2e66);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 3px;
+  font-weight: 700;
+}

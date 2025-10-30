@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const reviewHTML = `
         <article class="review-item card" style="opacity: 0; transform: translateY(20px);">
-          <img src="${review.avatar}" class="img-circle" alt="${review.author} avatar">
+        <div class="avatar">
+          <img src="${review.avatar}" alt="${review.author} avatar">
+        </div>
           <div class="review-text-content">
             <strong>${review.author}</strong>
             <small style="color:var(--muted);"> · ${review.date}</small>

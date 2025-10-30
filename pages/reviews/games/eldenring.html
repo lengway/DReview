@@ -13,65 +13,9 @@
 <body id="review-page">
   <div class="layout">
     <header class="header" role="banner">
-      <nav id="top-nav" class="navbar">
-        <div class="container nav-inner">
-          <a href="../../home.html" class="brand-header">
-            <img src="../../../images/logo.png" alt="DReview logo">
-          </a>
-
-          <div class="nav-links">
-            <a href="../../home.html" class="nav-link">Home</a>
-            <a href="../../games.html" class="nav-link">Games</a>
-            <a href="../../movies.html" class="nav-link">Movies</a>
-            <a href="../../about.html" class="nav-link">About</a>
-            <a href="../../imagegallery.html" class="nav-link">Image Gallery</a>
-            <a href="../../login.html" class="nav-link nav-cta">Sign in</a>
-          </div>
-        </div>
-      </nav>
     </header>
 
     <aside class="sidebar">
-
-      <nav class="sidebar-nav">
-        <ul class="nav-list">
-          <li class="nav-item">
-            <a href="../../home.html" class="nav-link">
-              <span class="nav-text">Home</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="../../games.html" class="nav-link">
-              <span class="nav-text">Games</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="../../movies.html" class="nav-link">
-              <span class="nav-text">Movies</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a href="../../about.html" class="nav-link">
-              <span class="nav-text">About</span>
-            </a>
-          </li>
-
-          <li class="nav-item nav-sep" aria-hidden="true"></li>
-
-          <li class="nav-item">
-            <a href="../../login.html" class="nav-link nav-cta">
-              <span class="nav-text">Sign in</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="sidebar-footer">
-        <small class="sidebar-copy">DReview • Team: Dauren, Roman</small>
-      </div>
     </aside>
 
     <main class="main">
@@ -117,27 +61,23 @@
           </div>
 
           <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
-            <div class="review-counter" id="review-counter" style="color:var(--muted)">Reviews: <strong
-                id="review-count">0</strong></div>
-            <button id="load-more-btn" class="btn">Смотреть ещё</button>
+            <div class="review-counter" id="review-counter" style="color:var(--muted)">Reviews: 
+              <strong id="review-count">0</strong></div>
+            <button id="load-more-btn" class="btn">Load more</button>
           </div>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <div class="container footer-inner">
-        <a href="../../home.html" class="brand-footer">
-          <img src="../../../images/logo.png" alt="DReview logo">
-        </a>
-        <p class="footer-team">Team: Dauren, Roman</p>
-      </div>
     </footer>
   </div>
 
-  <script src="../../../scripts/keyboardNavigation.js"></script>
-  <script src="../../../scripts/rating.js"></script>
-  <script src="../../../scripts/reviews.js"></script>
+  <script src="/scripts/sidebarToggle.js" defer></script>
+  <script src="/scripts/styleLoader.js" defer></script>
+  <script src="/scripts/main.js" defer></script>
+  <script src="/scripts/rating.js"></script>
+  <script src="/scripts/reviews.js"></script>
 </body>
 
 </html>

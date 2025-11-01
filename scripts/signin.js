@@ -3,6 +3,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 const SUPABASE_URL = window.__ENV?.SUPABASE_URL
 const SUPABASE_ANON_KEY = window.__ENV?.SUPABASE_ANON_KEY
 
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing Supabase config. Make sure env.js is loaded and contains SUPABASE_URL and SUPABASE_ANON_KEY.')
+}
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // элементы

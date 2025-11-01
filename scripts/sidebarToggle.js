@@ -1,6 +1,8 @@
-function initSidebarToggle(){
+function initSidebarToggle() {
   const toggleBtn = document.getElementById("sidebar-toggle");
   const sidebar = document.querySelector(".sidebar");
+  const closeBtn = document.getElementById('sidebar-close');
+  const overlay = document.getElementById('overlay');
   // find layout by id or class for robustness across pages
   const layout = document.getElementById("layout") || document.querySelector('.layout');
   if (!toggleBtn || !sidebar || !layout) {
@@ -8,26 +10,56 @@ function initSidebarToggle(){
     return;
   }
 
-  // restore saved state if present
-  try {
-    const saved = localStorage.getItem('sidebar-hidden');
-    if (saved === 'true') {
-      sidebar.classList.add('hidden');
-      layout.classList.add('sidebar-hidden');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-    } else {
-      toggleBtn.setAttribute('aria-expanded', String(!sidebar.classList.contains('hidden')));
+  // Установим начальное состояние для мобильной версии
+  toggleBtn.setAttribute('aria-expanded', 'false');
+
+  function openMobileSidebar() {
+    document.body.classList.add('overlay-active');
+    sidebar.classList.add('open');
+    if (overlay) {
+      overlay.style.display = 'block';
+      // Форсируем reflow
+      overlay.offsetHeight;
+      overlay.classList.add('active');
     }
-  } catch (e) { /* ignore storage errors */ }
+    toggleBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeMobileSidebar() {
+    document.body.classList.remove('overlay-active');
+    sidebar.classList.remove('open');
+    if (overlay) {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 300);
+    }
+    toggleBtn.setAttribute('aria-expanded', 'false');
+  }
 
   toggleBtn.addEventListener("click", () => {
-    // toggle both visual state and layout class — CSS will animate grid columns
-    const hiddenNow = sidebar.classList.toggle("hidden");
-    layout.classList.toggle("sidebar-hidden");
-    // update aria
-    toggleBtn.setAttribute('aria-expanded', String(!hiddenNow));
-    try { localStorage.setItem('sidebar-hidden', String(hiddenNow)); } catch (e) {}
+    const opened = sidebar.classList.toggle('open');
+    if (overlay) {
+      if (opened) {
+        overlay.style.display = 'block';
+        // Форсируем reflow для плавной анимации
+        overlay.offsetHeight;
+        overlay.classList.add('active');
+      } else {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 300);
+      }
+    }
+    toggleBtn.setAttribute('aria-expanded', opened ? 'true' : 'false');
   });
+
+  // close button & overlay handlers
+  if (closeBtn) closeBtn.addEventListener('click', closeMobileSidebar);
+  if (overlay) overlay.addEventListener('click', closeMobileSidebar);
+
+
 }
 
 document.addEventListener("DOMContentLoaded", initSidebarToggle);

@@ -84,28 +84,33 @@
   // --- Theme switcher ---
   function initThemeToggle() {
     if (window.__themeToggleInitialized) return;
-
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) {
-      console.warn('Theme toggle button not found in DOM');
-      return setTimeout(initThemeToggle, 100);
-    }
     window.__themeToggleInitialized = true;
-    const icon = btn.querySelector('.icon');
 
-    // checking local stored theme
+    // helper: ищем элементы на странице (могут появиться асинхронно)
+    const getBtn = () => document.getElementById('theme-toggle');
+    const getSidebarBtn = () => document.getElementById('sidebar-theme-toggle');
+
+    // apply initial state from storage
     const stored = localStorage.getItem('theme');
     const isLightStored = stored === 'light';
+    if (isLightStored) document.body.classList.add('light');
+    else document.body.classList.remove('light');
 
-    if (isLightStored) {
-      document.body.classList.add('light');
-      if (icon) icon.textContent = '☀️';
-      btn.setAttribute('aria-pressed', 'true');
-    } else {
-      document.body.classList.remove('light');
-      if (icon) icon.textContent = '🌙';
-      btn.setAttribute('aria-pressed', 'false');
+    function updateButtons(isLight) {
+      const btn = getBtn();
+      const sidebarBtn = getSidebarBtn();
+      const icon = btn && btn.querySelector('.icon');
+      const sidebarIcon = sidebarBtn && sidebarBtn.querySelector('.icon');
+
+      if (icon) icon.textContent = isLight ? '☀️' : '🌙';
+      if (sidebarIcon) sidebarIcon.textContent = isLight ? '☀️' : '🌙';
+
+      if (btn) btn.setAttribute('aria-pressed', String(isLight));
+      if (sidebarBtn) sidebarBtn.setAttribute('aria-pressed', String(isLight));
     }
+
+    // init UI immediately
+    updateButtons(isLightStored);
 
     function withThemeTransition(fn) {
       const root = document.documentElement;
@@ -116,15 +121,49 @@
       });
     }
 
-    btn.addEventListener('click', () => {
+    function toggleTheme() {
       withThemeTransition(() => {
         const isLight = document.body.classList.toggle('light');
-        const ic = btn.querySelector('.icon');
-        if (ic) ic.textContent = isLight ? '☀️' : '🌙';
-        btn.setAttribute('aria-pressed', String(isLight));
+        // sync icons and aria on both buttons
+        updateButtons(isLight);
         localStorage.setItem('theme', isLight ? 'light' : 'dark');
       });
-    });
+    }
+
+    // attach listeners when buttons exist; если их нет — наблюдаем за DOM изменениям
+    function attachIfReady() {
+      const btn = getBtn();
+      const sidebarBtn = getSidebarBtn();
+
+      if (btn) {
+        // удалить старые слушатели (на случай повторной инициализации)
+        btn.replaceWith(btn.cloneNode(true));
+      }
+      if (sidebarBtn) {
+        sidebarBtn.replaceWith(sidebarBtn.cloneNode(true));
+      }
+
+      const freshBtn = getBtn();
+      const freshSidebarBtn = getSidebarBtn();
+
+      if (freshBtn) freshBtn.addEventListener('click', toggleTheme);
+      if (freshSidebarBtn) freshSidebarBtn.addEventListener('click', toggleTheme);
+
+      // если хотя бы одна кнопка присоединилась — всё ок, иначе ждем появления
+      if (!freshBtn && !freshSidebarBtn) return false;
+      return true;
+    }
+
+    if (!attachIfReady()) {
+      // наблюдатель DOM, чтобы поймать появление фрагментов (fragments)
+      const observer = new MutationObserver(() => {
+        if (attachIfReady()) observer.disconnect();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      // safety timeout: перестать наблюдать через 5s
+      setTimeout(() => observer.disconnect(), 5000);
+    }
   }
 
   // --- Keyboard navigation ---
@@ -197,19 +236,20 @@
   // initialize
   onReady(() => {
     ensureLoader();
-
     applyStoredThemeImmediate();
 
     const stylesPromise = (window.loadStyles ? window.loadStyles(window.STYLES) : Promise.resolve([]));
-
     const injectorPromise = initInjector();
 
-    initThemeToggle();
+    // Убираем прежний прямой вызов initThemeToggle() здесь
     initKeyboardNavigation();
 
     Promise.all([stylesPromise, injectorPromise]).then(() => {
+      // ГАРАНТИРОВАННО: фрагменты загружены — можно инициализировать переключатель
+      initThemeToggle();
       setTimeout(removeLoader, 120);
     }).catch(() => {
+      initThemeToggle(); // на всякий случай
       setTimeout(removeLoader, 400);
     });
   });

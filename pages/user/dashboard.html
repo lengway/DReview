@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DReview - Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/fragments.css" />
+    <link rel="icon" href="/images/logo.png" type="image/png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="scroll-progress"></div>
+    <div id="overlay" class="overlay"></div>
+    <div class="layout" id="layout">
+        <div class="header"></div>
+        <aside class="sidebar"></aside>
+
+        <main id="app" class="main hidden">
+            <div class="profile">
+                <h2>Dashboard</h2>
+                <p>You are<span id="user-email"></span></p>
+                <img id="avatar" src="" alt="avatar" width="80" height="80" />
+                <form id="profile-form">
+                    <label>Full name
+                        <input id="full_name" type="text" />
+                    </label>
+                    <label>Avatar URL
+                        <input id="avatar_url" type="text" />
+                    </label>
+                    <label>About me
+                        <textarea id="bio" rows="4"></textarea>
+                    </label>
+                    <button type="submit">Save</button>
+                </form>
+                <button id="logoutBtn">Quit</button>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

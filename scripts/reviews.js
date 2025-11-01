@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const hiddenText = showReadMore ? reviewText.substring(200) : '';
 
       const reviewHTML = `
-        <article class="review-item card" style="opacity: 0; transform: translateY(20px);">
+        <article class="review-item">
         <div class="avatar">
           <img src="${review.avatar}" alt="${review.author} avatar">
         </div>
@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <strong>${review.author}</strong>
             <small style="color:var(--muted);"> · ${review.date}</small>
             <div class="review-body">
-                
                 <p class="review-paragraph">
                     ${visibleText}<span class="more-text">${hiddenText}</span>
                 </p>

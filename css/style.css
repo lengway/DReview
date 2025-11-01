@@ -216,14 +216,14 @@ h3 {
   transition: grid-template-columns 0.28s ease; /* не все браузеры анимируют это, но OK */
 }
 
-/* HEADER */
+/* HEADER
 .header {
   grid-area: header;
   position: sticky;
   top: 0;
   z-index: 60;
   background: var(--header-bg);
-  border-bottom: 1px solid var(--header-border);
+  border-bottom: 2px solid var(--header-border);
 }
 
 #top-nav.navbar {
@@ -276,7 +276,6 @@ h3 {
   background: var(--overlay-2);
 }
 
-/* Theme toggle button (pill) */
 .theme-toggle {
   --size: 40px;
   display: inline-flex;
@@ -304,7 +303,6 @@ h3 {
   background: var(--bg);
   color: var(--text);
   box-shadow: var(--shadow);
-  /* transform: translateX(-20px); */
   transform: translate3d(-16px, 0px, 0);
   transition: transform 220ms ease, background-color 220ms ease, color 220ms ease;
 }
@@ -316,7 +314,7 @@ h3 {
 .theme-toggle:hover {
   outline: none;
   box-shadow: 0 0 0 4px rgba(108, 140, 255, 0.12);
-}
+} */
 
 /* SIDEBAR */
 /* .sidebar {
@@ -492,82 +490,6 @@ h3 {
 
 #review-page .btn:hover {
   transform: none;
-}
-
-.review-row {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.review-row .cover {
-  flex: 0 0 320px;
-  min-width: 200px;
-}
-
-.review-row .cover img {
-  border-radius: 10px;
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.review-row .review-title {
-  flex: 1 1 1px;
-  min-width: 240px;
-}
-
-.stars {
-  font-size: 1.15rem;
-  color: var(--primary);
-  display: inline-flex;
-  gap: 6px;
-  margin: .4rem 0;
-}
-
-.reviews-list {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.avatar {
-  width: 120px;
-  height: 80px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--img-border);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.02);
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.img-circle {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  border: 2px solid var(--img-border);
-}
-
-.review-text strong {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.review-text small {
-  color: var(--muted);
 }
 
 .grid-1 {
@@ -1135,9 +1057,7 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .review-row {
-    flex-direction: column;
-  }
+  /* review-row handled in review-page.css */
 
   .login-box {
     padding: 1rem;

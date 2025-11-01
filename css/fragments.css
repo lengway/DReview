@@ -199,6 +199,7 @@
 
 #sidebar-theme-toggle {
   overflow: hidden;
+  display: none;
 }
 
 /* Mobile Styles */
@@ -338,6 +339,7 @@
 
   #sidebar-theme-toggle {
     overflow: visible;
+    display: flex;
   }
 
   .sidebar-toggle {

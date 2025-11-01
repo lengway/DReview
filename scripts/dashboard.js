@@ -9,8 +9,11 @@ const app = document.getElementById('app')
 const userEmailEl = document.getElementById('user-email')
 const avatarEl = document.getElementById('avatar')
 const profileForm = document.getElementById('profile-form')
-const fullNameInput = document.getElementById('full_name')
+const fullname = document.getElementById('full_name')
+const fullNameDisplay = document.getElementById('full_name_display')
+const fullNameInput = document.getElementById('full_name_input')
 const avatarInput = document.getElementById('avatar_url')
+const bioDisplay = document.getElementById('bio_display')
 const bioInput = document.getElementById('bio')
 const logoutBtn = document.getElementById('logoutBtn')
 
@@ -44,8 +47,11 @@ async function init() {
 
   // заполняем форму
   if (profile) {
+    fullname.textContent = profile.full_name || 'No name'
+    fullNameDisplay.textContent = profile.full_name || 'No name'
     fullNameInput.value = profile.full_name || ''
     avatarInput.value = profile.avatar_url || ''
+    bioDisplay.textContent = profile.bio || 'No bio'
     bioInput.value = profile.bio || ''
     avatarEl.src = profile.avatar_url || ''
   } else {

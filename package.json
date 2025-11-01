@@ -12,7 +12,8 @@
   "description": "DReview - is the simpliest way to acknowledge new things about games and movies. With this service you can give your persnonally review about new games and movies and discover something new about media you have never experienced.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "node scripts/generate-env.js",
+    "build": "vite build"
   },
   "repository": {
     "type": "git",

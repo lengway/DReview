@@ -1,7 +1,11 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
-const SUPABASE_URL = window.__ENV?.SUPABASE_URL
-const SUPABASE_ANON_KEY = window.__ENV?.SUPABASE_ANON_KEY
+// const SUPABASE_URL = 'http://127.0.0.1:54321'
+// const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+
+const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I" // твой anon key
+
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('Missing Supabase config. Make sure env.js is loaded and contains SUPABASE_URL and SUPABASE_ANON_KEY.')
@@ -70,9 +74,11 @@ if (form) {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-      if (error) throw error
-
+      
+      if (error) {
+        console.log('SIGNIN ERROR RAW', error);
+        throw error
+      }
       // успешный вход — хранить токен в localStorage (или использовать сессионные куки на сервере)
       if (data?.session?.access_token) {
         localStorage.setItem('token', data.session.access_token)

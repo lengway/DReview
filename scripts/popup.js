@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 900);
         }, SIM_DELAY);
     });
+});
 
-
-    function showLocalToast(msg, type = 'info') {
+export function showLocalToast(msg, type = 'info') {
         $('.local-toast').remove();
 
         const $t = $('<div></div>')
@@ -159,4 +159,3 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }, 2000);
     }
-});

@@ -1,8 +1,18 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+import { showLocalToast } from './popup.js';
 
-const supabaseUrl = 'https://zqdqbvcppkwurakulier.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// const SUPABASE_URL = 'http://127.0.0.1:54321'
+// const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+
+const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I" // твой anon key
+
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing Supabase config. Make sure env.js is loaded and contains SUPABASE_URL and SUPABASE_ANON_KEY.')
+}
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const form = document.querySelector('.login-box');
 const emailInput = document.querySelector('#email');
@@ -104,6 +114,20 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  alert('Check your email for the confirmation link.');
+  const user = data?.user
+  // Если пользователь уже подтверждён или instant sign-up — upsert профиля.
+  if (user) {
+    const { error: upsertErr } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        full_name: null,
+        avatar_url: null
+      }, { returning: 'minimal' })
+    if (upsertErr) console.error('Profile upsert error', upsertErr)
+  }
+
+  showLocalToast('Sign up successful! Now you can sign in.');
+  setTimeout(() => { }, 900);
   window.location.href = 'signin.html';
 });

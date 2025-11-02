@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/lengway/DReview/issues"
   },
-  "homepage": "https://github.com/lengway/DReview#readme"
+  "homepage": "https://github.com/lengway/DReview#readme",
+  "devDependencies": {
+    "supabase": "^2.54.11"
+  }
 }

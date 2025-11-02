@@ -2,26 +2,43 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>DReview — Games</title>
-	<link rel="stylesheet" href="../css/style.css" />
-	<link rel="stylesheet" href="../css/search.css" />
-	<link rel="icon" href="../images/logo.png" type="image/png">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DReview — Games</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/search.css" />
+    <link rel="icon" href="../images/logo.png" type="image/png">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body id="games-page">
-	<div id="overlay" class="overlay"></div>
-	<div id="scroll-progress"></div>
-	<div class="layout">
-		<header class="header">
-		</header>
+    <div id="overlay" class="overlay"></div>
+    <div id="scroll-progress"></div>
+    <div class="layout">
+        <header class="header">
+        </header>
 
-		<aside class="sidebar">
-		</aside>
+        <aside class="sidebar">
+        </aside>
 
-		<main class="main">
+        <main class="main">
+            <header class="hero section">
+                <div class="container">
+                    <h1 class="hero-title">Games</h1>
+                    <p class="hero-subtitle">Explore trending titles and classics. Click any card to start your review
+                        on Home.
+                    </p>
+                </div>
+            </header>
+
+            <div class="container">
+                <section class="section">
+                    <div id="products" data-product-type="game" class="grid-2"></div>
+                </section>
+            </div>
+        </main>
+
+        <!-- <main class="main">
 			<header class="hero section">
 				<div class="container">
 					<h1 class="hero-title">Games</h1>
@@ -80,16 +97,19 @@
 					</div>
 				</div>
 			</section>
-		</main>
+		</main> -->
 
-		<footer class="footer">
-		</footer>
-	</div>
+    <!-- <button id="load-more-btn" class="loadMore">Load more</button> -->
 
-	<script src="/scripts/search.js"></script>
-	<script src="/scripts/sidebarToggle.js" defer></script>
-	<script src="/scripts/styleLoader.js" defer></script>
-	<script src="/scripts/main.js" defer></script>
+        <footer class="footer">
+        </footer>
+    </div>
+
+    <script type="module" src="/scripts/products.js"></script>
+    <script src="/scripts/search.js"></script>
+    <script src="/scripts/sidebarToggle.js" defer></script>
+    <script src="/scripts/styleLoader.js" defer></script>
+    <script src="/scripts/main.js" defer></script>
 </body>
 
 </html>

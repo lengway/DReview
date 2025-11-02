@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Review — Loading...</title>
+    <script src="/scripts/styleLoader.js" defer></script>
+</head>
+
+<body id="game-page">
+    <div id="scroll-progress"></div>
+    <div id="overlay" class="overlay"></div>
+    <div class="layout" id="layout">
+        <header class="header" id="header">
+        </header>
+
+        <aside class="sidebar" id="sidebar">
+        </aside>
+
+        <main class="main" id="main">
+            <section class="hero">
+                <div class="container">
+                    <h1 class="hero-title" id="hero-title"><!--js--></h1>
+                </div>
+            </section>
+
+
+            <section class="section panel">
+                <div class="container">
+                    <div class="review-row">
+                        <div class="cover">
+                            <img src="" alt="" id="cover">
+                        </div>
+
+                        <div class="review-title">
+                            <h2 id="summary-heading"></h2>
+
+                            <p class="description" id="description">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div id="reviews" class="reviews"></div>
+        </main>
+
+        <footer class="footer" id="footer">
+        </footer>
+    </div>
+
+    <script src="/env.js"></script>
+    <script src="/scripts/main.js" defer></script>
+    <script src="/scripts/sidebarToggle.js" defer></script>
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+        // const SUPABASE_URL = 'http://127.0.0.1:54321'
+        // const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+
+        const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co"
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I" // твой anon key
+
+
+        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+            console.error('Missing Supabase config. Make sure env.js is loaded and contains SUPABASE_URL and SUPABASE_ANON_KEY.')
+        }
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        // const defaultAvatar = '/images/default-avatar.png'
+
+        // helper: get ?slug=... from URL 
+        function getSlug() {
+            const params = new URLSearchParams(location.search)
+            return params.get('slug') || null
+        }
+
+        function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]) }
+
+        (async function main() {
+            const slug = getSlug()
+            if (!slug) {
+                document.getElementById('title').textContent = 'Не указан slug'
+                return
+            }
+
+            // определяем, movie или game по пути: если в урле есть /games/ или /games.html
+            const path = location.pathname.toLowerCase()
+            const productType = path.includes('/games') || path.includes('game') ? 'game' : 'movie'
+            const tableName = productType === 'game' ? 'games' : 'movies'
+
+            try {
+                // сначала пробуем найти по slug, затем — по id
+                let { data: product, error } = await supabase
+                    .from(tableName)
+                    .select('id, title, description, img_url, created_at, slug')
+                    .eq('slug', slug)
+                    .maybeSingle()
+
+                if (!product) {
+                    // попробуем как id
+                    const { data: byId } = await supabase
+                        .from(tableName)
+                        .select('id, title, description, img_url, created_at, slug')
+                        .eq('id', slug)
+                        .maybeSingle()
+                    product = byId
+                }
+
+                if (!product) {
+                    document.getElementById('not-found').style.display = 'block'
+                    document.getElementById('title').textContent = 'Не найдено'
+                    return
+                }
+
+                // отрисовка основного блока
+                document.getElementById('hero-title').textContent = product.title + ' Review'
+                document.getElementById('summary-heading').textContent = product.title || 'Без названия'
+                document.getElementById('description').textContent = product.description || ''
+                // document.getElementById('title').textContent = product.title || 'Без названия'
+                // document.getElementById('desc').textContent = product.short_description || ''
+                document.getElementById('cover').src = product.img_url || '/images/placeholder.png'
+                document.title = 'DReview  — ' + (product.title)
+
+                // загрузим средний рейтинг через RPC (если есть)
+                try {
+                    const { data: stats, error: statsErr } = await supabase.rpc('get_product_review_stats', { p_type: productType, p_id: product.id })
+                    if (statsErr) {
+                        // не критично — просто логируем
+                        console.warn('RPC get_product_review_stats error:', statsErr)
+                    } else if (stats && stats.length) {
+                        const avg = stats[0].avg_rating ? Number(stats[0].avg_rating).toFixed(2) : '—'
+                        document.getElementById('meta').textContent = `Средний рейтинг: ⭐ ${avg}`
+                    }
+                } catch (e) {
+                    // игнорируем, если RPC нет или вызывается неправильно
+                    console.warn('RPC call failed (ignored):', e)
+                }
+
+                // загрузим отзывы — теперь с product_type + product_id фильтрами
+                const { data: reviews, error: revErr } = await supabase
+                    .from('reviews')
+                    .select('id, rating, body, user_id, created_at, title')
+                    .eq('product_type', productType)
+                    .eq('product_id', product.id)
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false })
+
+                if (revErr) {
+                    console.error('Ошибка загрузки отзывов:', revErr)
+                    document.getElementById('reviews').textContent = 'Ошибка при загрузке отзывов'
+                    return
+                }
+
+                const reviewsEl = document.getElementById('reviews')
+                reviewsEl.innerHTML = ''
+
+                if (!reviews || reviews.length === 0) {
+                    reviewsEl.textContent = 'No reviews yes — be the first. 👊'
+                    return
+                }
+
+                // собираем уникальные user_id чтобы подтянуть full_name из profiles
+                const userIds = Array.from(new Set(reviews.map(r => r.user_id).filter(Boolean)))
+                let profilesMap = {}
+                if (userIds.length) {
+                    const { data: profiles, error: profErr } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, avatar_url')
+                        .in('id', userIds)
+
+                    if (!profErr && profiles) {
+                        profilesMap = profiles.reduce((acc, p) => {
+                            acc[p.id] = { name: p.full_name || null, avatar: p.avatar_url || null }
+                            return acc
+                        }, {})
+                    } else if (profErr) {
+                        console.warn('Не удалось загрузить profiles:', profErr)
+                    }
+                }
+
+                // рендерим отзывы с именами и аватарками из profiles
+                for (const r of reviews) {
+                    const div = document.createElement('div')
+                    div.className = 'review'
+                    const when = r.created_at ? new Date(r.created_at).toLocaleString() : ''
+                    const profile = r.user_id ? profilesMap[r.user_id] : null
+                    const authorName = profile?.name ? profile.name : (r.user_id ? ('Пользователь ' + r.user_id.slice(0, 6)) : 'Аноним')
+                    const avatarSrc = profile?.avatar ? profile.avatar : '/images/avatar-placeholder.png' // путь к плейсхолдеру
+                    const reviewTitle = r.title ? `<h4>${escapeHtml(r.title)}</h4>` : ''
+                    // div.innerHTML = `<img class="avatar" src=${escapeHtml(authorAvatar)}><strong>${escapeHtml(authorName)}</strong> — ⭐ ${escapeHtml(String(r.rating ?? '-'))} <small class="meta">· ${escapeHtml(when)}</small>
+                    //        <div>${escapeHtml(r.body || '')}</div>`
+                    div.innerHTML = `
+                        <article class="review-item">
+                            <div class="review-left">
+                                <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
+                                <div class="review-author">${escapeHtml(authorName)}</div>
+                                <div class="review-rating">⭐ ${escapeHtml(String(r.rating ?? '-'))}</div>
+                            </div>
+
+                            <div class="review-content">
+                                <div class="review-body">
+                                    ${reviewTitle}
+                                    <div class="review-text">
+                                        ${escapeHtml(r.body || '')}
+                                    </div>
+                                </div>
+                                <div class="review-footer">
+                                    ${escapeHtml(when)}
+                                </div>
+                            </div>
+                        </article>
+                        `
+                    reviewsEl.appendChild(div)
+                }
+
+            } catch (err) {
+                console.error(err)
+                document.getElementById('title').textContent = 'Loading error.'
+                document.getElementById('reviews').textContent = 'Cannot fetch data.'
+            }
+        })()
+    </script>
+</body>
+
+</html>

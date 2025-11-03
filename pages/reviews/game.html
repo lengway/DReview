@@ -193,7 +193,9 @@
                     div.innerHTML = `
                         <article class="review-item">
                             <div class="review-left">
-                                <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
+                                <a href="/pages/user/user.html?id=${encodeURIComponent(r.user_id || '')}">
+                                    <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
+                                </a>
                                 <div class="review-author">${escapeHtml(authorName)}</div>
                                 <div class="review-rating">⭐ ${escapeHtml(String(r.rating ?? '-'))}</div>
                             </div>

@@ -37,32 +37,37 @@
                         writing your
                         own.
                     </p>
+
+                    <div class="grid-3">
+                        <div class="reviews-stat">
+                            <div class="stat">
+                                <span class="stat-value" data-target="0">0</span>
+                                <span class="stat-label">Reviews</span>
+                            </div>
+                        </div>
+                        <div class="reviews-stat">
+                            <div class="stat">
+                                <span class="stat-value" data-target="0">0</span>
+                                <span class="stat-label">Games</span>
+                            </div>
+                        </div>
+                        <div class="reviews-stat">
+                            <div class="stat">
+                                <span class="stat-value" data-target="0">0</span>
+                                <span class="stat-label">Movies</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </section>
 
             <section class="section section-muted">
                 <div class="container">
-                    <h2 class="section-title">Featured Reviews</h2>
+                    <h2 class="section-title">Random Reviews</h2>
                     <div class="grid-2">
-                        <article class="card">
-                            <a href="reviews/games/eldenring.html">
-                                <img src="../images/eldenring.jpg" alt="Elden Ring" class="card-img" />
-                                <div class="card-body">
-                                    <h3 class="card-title">Elden Ring</h3>
-                                    <p class="card-text">FromSoftware’s vast open-world action RPG.</p>
-                                </div>
-                            </a>
-                        </article>
-
-                        <article class="card">
-                            <a href="reviews/movies/godfather.html">
-                                <img src="../images/godfather.jpg" alt="The Godfather" class="card-img" />
-                                <div class="card-body">
-                                    <h3 class="card-title">The Godfather</h3>
-                                    <p class="card-text">Crime, family, and power — a timeless classic.</p>
-                                </div>
-                            </a>
-                        </article>
+                        <!-- Random reviews will be loaded here dynamically -->
                     </div>
                 </div>
             </section>
@@ -74,7 +79,119 @@
 
     <script src="/scripts/sidebarToggle.js" defer></script>
     <script src="/scripts/styleLoader.js" defer></script>
-    <script src="/scripts/main.js" defer></script>
+    <script type="module" src="/scripts/main.js" defer></script>
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+
+        $(async function () {
+            // const SUPABASE_URL = 'http://127.0.0.1:54321'
+            // const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+
+            const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co"
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I" // твой anon key
+
+
+            const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+            // Получаем количество записей в таблицах
+            const { count: reviewsCount } = await supabase
+                .from('reviews')
+                .select('*', { count: 'exact', head: true })
+
+            const { count: gamesCount } = await supabase
+                .from('games')
+                .select('*', { count: 'exact', head: true })
+
+            const { count: moviesCount } = await supabase
+                .from('movies')
+                .select('*', { count: 'exact', head: true })
+
+            // Обновляем значения data-target
+            const statEls = document.querySelectorAll('.stat-value')
+            statEls[0].setAttribute('data-target', reviewsCount ?? 0)
+            statEls[1].setAttribute('data-target', gamesCount ?? 0)
+            statEls[2].setAttribute('data-target', moviesCount ?? 0)
+
+            // Функция плавной анимации
+            function animateCount($el, target) {
+                $({ countNum: 0 }).animate(
+                    { countNum: target },
+                    {
+                        duration: 2000,
+                        easing: "swing",
+                        step: function () {
+                            $el.text(Math.floor(this.countNum))
+                        },
+                        complete: function () {
+                            $el.text(this.countNum)
+                        }
+                    }
+                )
+            }
+
+            // Запускаем анимацию для всех трёх
+            $(".stat-value").each(function () {
+                const $this = $(this)
+                const target = parseInt($this.attr("data-target"))
+                animateCount($this, target)
+            })
+
+            async function loadFeatured() {
+                const featuredGrid = document.querySelector('.grid-2')
+                if (!featuredGrid) return
+
+                // загружаем все игры и фильмы (или с лимитом, если их много)
+                const { data: games } = await supabase
+                    .from('games')
+                    .select('*')
+
+                const { data: movies } = await supabase
+                    .from('movies')
+                    .select('*')
+
+                // выбираем случайные элементы
+                const randomGame = games?.[Math.floor(Math.random() * games.length)]
+                const randomMovie = movies?.[Math.floor(Math.random() * movies.length)]
+
+                // очищаем контейнер
+                featuredGrid.innerHTML = ''
+
+                // карточка игры
+                if (randomGame) {
+                    featuredGrid.innerHTML += `
+            <article class="card">
+                <a href="reviews/games/${randomGame.slug || randomGame.id}.html">
+                    <img src="${randomGame.img_url || '../images/default-game.jpg'}" alt="${randomGame.title}" class="card-img" />
+                    <div class="card-body">
+                        <h3 class="card-title">${randomGame.title}</h3>
+                        <p class="card-text">${randomGame.short_description || 'No description available.'}</p>
+                    </div>
+                </a>
+            </article>`
+                }
+
+                // карточка фильма
+                if (randomMovie) {
+                    featuredGrid.innerHTML += `
+            <article class="card">
+                <a href="reviews/movies/${randomMovie.slug || randomMovie.id}.html">
+                    <img src="${randomMovie.img_url || '../images/default-movie.jpg'}" alt="${randomMovie.title}" class="card-img" />
+                    <div class="card-body">
+                        <h3 class="card-title">${randomMovie.title}</h3>
+                        <p class="card-text">${randomMovie.short_description || 'No description available.'}</p>
+                    </div>
+                </a>
+            </article>`
+                }
+            }
+
+            // вызываем после загрузки страницы
+            await loadFeatured()
+
+
+        })
+    </script>
+
 </body>
 
 </html>

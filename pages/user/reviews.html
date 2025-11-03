@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DReview — Loading...</title>
+    <script src="/scripts/styleLoader.js" defer></script>
+    <link rel="stylesheet" href="/css/user-reviews-page.css">
+</head>
+
+<body id="reviews-page">
+    <div id="scroll-progress"></div>
+    <div id="overlay" class="overlay"></div>
+    <div class="layout" id="layout">
+        <header class="header"></header>
+        <aside class="sidebar"></aside>
+
+        <main class="main">
+            <header class="hero section">
+                <div class="container">
+                    <h1 class="hero-title">Loading...</h1>
+                    <p class="hero-subtitle">Please wait while we load the reviews.</p>
+                </div>
+            </header>
+
+            <div class="container">
+                <div class="grid-1" id="review-list">
+                    <div class="loading-spinner">
+                        <div>⏳ Loading reviews...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer"></footer>
+    </div>
+
+    <script src="/env.js"></script>
+    <script src="/scripts/sidebarToggle.js" defer></script>
+    <script type="module" src="/scripts/main.js" defer></script>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+        // Конфигурация Supabase
+        // const SUPABASE_URL = 'http://127.0.0.1:54321'
+        // const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+
+        const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co"
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I" // твой anon key
+
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        async function getUserId() {
+            const params = new URLSearchParams(location.search)
+            if (params.has('id')) {
+                console.log('Using user ID from URL:', params.get('id'))
+                return params.get('id')
+            }
+
+            console.log('No ID in URL, checking authenticated user...')
+            const { user, error } = await getCurrentUser()
+            if (error || !user) {
+                console.warn('No user logged in and no ID in URL')
+                return null
+            }
+            console.log('Using authenticated user ID:', user.id)
+            return user.id
+        }
+
+        function escapeHtml(s) {
+            return String(s || '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[c])
+        }
+
+        async function getCurrentUser() {
+            const { data, error } = await supabase.auth.getUser()
+            if (error) {
+                console.error('supabase.auth.getUser error', error)
+                return { user: null, error }
+            }
+            return { user: data?.user ?? null, error: null }
+        }
+
+        function truncateText(text, maxLength = 50) {
+            if (!text) return ''
+            if (text.length <= maxLength) return text
+            return text.substring(0, maxLength).trim() + '...'
+        }
+
+        // Теперь функция ожидает, что у отзыва будет поле product_data (объект игры/фильма)
+        function createReviewCard(review) {
+            const media = review.product_data
+            if (!media) {
+                console.warn('Review without media data:', review)
+                return ''
+            }
+
+            const mediaType = review.product_type === 'game' ? 'game' : 'movie'
+            const mediaTitle = media.title || media.name || 'Untitled'
+            const mediaImage = media.cover_url || media.img_url || media.img_url || '/images/placeholder.jpg'
+
+            const rating = review.rating ?? 0
+            const truncatedContent = truncateText(review.body, 120)
+
+            const date = review.created_at ? new Date(review.created_at).toLocaleString() : ''
+
+            // Экранируем заголовки/контент
+            const safeTitle = escapeHtml(review.title || 'Untitled Review')
+            const safeMediaTitle = escapeHtml(mediaTitle)
+            const safeContent = escapeHtml(truncatedContent)
+
+            return `
+            <div class="review-card" onclick="window.location.href='/review.html?id=${encodeURIComponent(review.id)}'">
+                <div class="review-left">
+                    <img src="${escapeHtml(mediaImage)}" 
+                         alt="${safeMediaTitle}" 
+                         class="review-image"
+                         onerror="this.src='/images/placeholder.jpg'">
+                    <div class="review-media-title">${safeMediaTitle}</div>
+                </div>
+                <div class="review-right">
+                    <div class="review-header">
+                        <h3 class="review-title">${safeTitle}</h3>
+                        <div class="review-rating">
+                            <span class="rating-star">★</span>
+                            <span class="rating-value">${escapeHtml(String(rating))}/5</span>
+                        </div>
+                    </div>
+                    <p class="review-content">${safeContent}</p>
+                    <div class="review-meta">
+                        <span class="review-type ${mediaType}">${mediaType}</span>
+                        ${date ? `<span>${escapeHtml(date)}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `
+        }
+
+        function showNoReviews() {
+            const reviewList = document.getElementById('review-list')
+            if (reviewList) {
+                reviewList.innerHTML = `
+                <div class="no-reviews">
+                    <div class="no-reviews-icon">📝</div>
+                    <div class="no-reviews-text">No reviews yet</div>
+                    <div class="no-reviews-subtext">This user hasn't written any reviews</div>
+                </div>
+            `
+            }
+        }
+
+        function showError(message) {
+            const reviewList = document.getElementById('review-list')
+            if (reviewList) {
+                reviewList.innerHTML = `
+                <div class="error-message">
+                    ❌ ${escapeHtml(message)}
+                </div>
+            `
+            }
+        }
+
+        async function loadUserReviews() {
+            try {
+                const userId = await getUserId()
+
+                if (!userId) {
+                    const heroTitle = document.querySelector('.hero-title')
+                    const heroSubtitle = document.querySelector('.hero-subtitle')
+                    if (heroTitle) heroTitle.textContent = 'User not specified'
+                    if (heroSubtitle) heroSubtitle.textContent = 'Please provide a user ID in the URL'
+                    showError('User ID not found in URL')
+                    return
+                }
+
+                console.log('Loading reviews for user ID:', userId)
+
+                // Получаем информацию о пользователе (username и full_name)
+                const { data: userData, error: userError } = await supabase
+                    .from('profiles')
+                    .select('full_name')
+                    .eq('id', userId)
+                    .single()
+
+                if (userError) {
+                    console.error('Error fetching user:', userError)
+                    showError('User not found')
+                    return
+                }
+
+                const heroTitle = document.querySelector('.hero-title')
+                const heroSubtitle = document.querySelector('.hero-subtitle')
+                const displayName = userData.username || userData.full_name || 'User'
+                if (heroTitle) {
+                    heroTitle.textContent = `${displayName}'s Reviews`
+                }
+                document.title = `DReview — ${displayName}'s Reviews`
+
+                // Загружаем отзывы пользователя
+                const { data: reviews, error: reviewsError } = await supabase
+                    .from('reviews')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false })
+
+                if (reviewsError) {
+                    console.error('Error fetching reviews:', reviewsError)
+                    showError('Failed to load reviews')
+                    return
+                }
+
+                if (!reviews || reviews.length === 0) {
+                    if (heroSubtitle) heroSubtitle.textContent = '0 reviews written'
+                    showNoReviews()
+                    return
+                }
+
+                // Собираем ID продуктов
+                const gameIds = [...new Set(reviews
+                    .filter(r => r.product_type === 'game')
+                    .map(r => r.product_id).filter(Boolean))]
+
+                const movieIds = [...new Set(reviews
+                    .filter(r => r.product_type === 'movie')
+                    .map(r => r.product_id).filter(Boolean))]
+
+                // Объявляем контейнеры заранее
+                let gamesData = []
+                let moviesData = []
+
+                if (gameIds.length > 0) {
+                    const { data: gData, error: gError } = await supabase.from('games').select('*').in('id', gameIds)
+                    if (gError) {
+                        console.error('Error fetching games:', gError)
+                    } else {
+                        gamesData = gData || []
+                    }
+                }
+
+                if (movieIds.length > 0) {
+                    const { data: mData, error: mError } = await supabase.from('movies').select('*').in('id', movieIds)
+                    if (mError) {
+                        console.error('Error fetching movies:', mError)
+                    } else {
+                        moviesData = mData || []
+                    }
+                }
+
+                // Прикрепляем product_data к каждому отзыву (game/movie)
+                reviews.forEach(review => {
+                    review.product_data = review.product_type === 'game'
+                        ? gamesData.find(g => g.id === review.product_id) || null
+                        : moviesData.find(m => m.id === review.product_id) || null
+                })
+
+                // Обновляем подзаголовок с количеством отзывов
+                if (heroSubtitle) {
+                    const count = reviews.length
+                    heroSubtitle.textContent = `${count} ${count === 1 ? 'review' : 'reviews'} written`
+                }
+
+                // Генерируем HTML
+                const reviewList = document.getElementById('review-list')
+                if (!reviewList) return
+
+                const reviewsHTML = reviews
+                    .map(review => createReviewCard(review))
+                    .filter(html => html)
+                    .join('')
+
+                if (!reviewsHTML) {
+                    showNoReviews()
+                    return
+                }
+
+                reviewList.innerHTML = reviewsHTML
+                console.log('Reviews displayed successfully')
+
+            } catch (error) {
+                console.error('Unexpected error:', error)
+                showError('An unexpected error occurred')
+            }
+        }
+
+        // Запуск
+        loadUserReviews().catch(err => {
+            console.error('Critical error in loadUserReviews:', err)
+        })
+    </script>
+</body>
+
+</html>

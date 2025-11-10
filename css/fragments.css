@@ -203,7 +203,7 @@
 }
 
 /* Mobile Styles */
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .nav-inner {
     padding-left: 1rem;
   }

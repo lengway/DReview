@@ -1,205 +1,66 @@
-$(document).ready(function () {
+// search.js
+document.addEventListener("DOMContentLoaded", async () => {
+  const searchBar = document.getElementById("search-bar");
+  const resultsContainer = document.getElementById("results");
 
-  const PLACEHOLDER_THUMB = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='; // 1x1 transparent
-  const MAX_SUGGESTIONS = 8;
+  // ⚙️ Настройка Supabase
+  const SUPABASE_URL = "https://zqdqbvcppkwurakulier.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxZHFidmNwcGt3dXJha3VsaWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MDc3NTAsImV4cCI6MjA3NTI4Mzc1MH0.jp0RmoPLurjNVdQNxsLdVtwrm0yWnMW3_dRi3slSd7I";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const $search = $('#search-bar');
-  if ($search.length === 0) return;
+  let data = [];
 
-  if (!$search.parent().hasClass('search-wrap')) {
-    $search.wrap($('<div class="search-wrap" style="position:relative;display:block;max-width:760px;margin:0 auto;"></div>'));
+  // Определяем, какая страница открыта (movies или games)
+  const isMovies = window.location.pathname.includes("movies");
+  const table = isMovies ? "movies" : "games";
+
+  // Загружаем данные
+  async function loadData() {
+    const { data: rows, error } = await supabase
+      .from(table)
+      .select("*");
+    if (error) {
+      console.error("Ошибка Supabase:", error);
+      resultsContainer.innerHTML = "<p>Ошибка загрузки данных</p>";
+      return;
+    }
+    data = rows;
+    renderResults(data);
   }
-  let $suggest = $search.siblings('.search-suggestions');
-  if ($suggest.length === 0) {
-    $suggest = $(`
-      <div class="search-suggestions" role="listbox" aria-label="Search suggestions" aria-hidden="true">
-        <ul></ul>
-      </div>
-    `);
-    $search.after($suggest);
-  }
-  const $slist = $suggest.find('ul');
 
-  const $cards = $('.card');
-  const items = []; // { title, text, thumb, href, $card }
+  await loadData();
 
-  $cards.each(function () {
-    const $card = $(this);
-    const $a = $card.find('a').first();
-    const href = $a.attr('href') || '#';
-    const title = $card.find('.card-title').text().trim();
-    const text = $card.find('.card-text').text().trim();
-    const $img = $card.find('img.card-img').first();
-    const thumb = ($img.attr('data-src') || $img.attr('src') || '').trim();
-    items.push({ title, text, thumb, href, $card });
+  // 🔍 Поиск по названию и описанию
+  searchBar.addEventListener("input", () => {
+    const query = searchBar.value.toLowerCase();
+    const filtered = data.filter(item =>
+      item.title.toLowerCase().includes(query) ||
+      (item.description && item.description.toLowerCase().includes(query))
+    );
+    renderResults(filtered);
   });
 
-  const titles = [...new Set(items.map(i => i.title))];
+  // 🧩 Отрисовка карточек
+  function renderResults(items) {
+    resultsContainer.innerHTML = "";
 
-  function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
-
-  function highlightTerm(text, term) {
-    if (!term) return text;
-    const re = new RegExp('(' + esc(term) + ')', 'ig');
-    return text.replace(re, '<mark class="search-highlight">$1</mark>');
-  }
-
-  function filterCards(query) {
-    const q = (query || '').trim().toLowerCase();
-
-    if (!q) {
-      $cards.show();
-      items.forEach(it => {
-        it.$card.find('.card-title').html(it.title);
-        it.$card.find('.card-text').html(it.text);
-      });
-      $('.no-results').remove();
+    if (items.length === 0) {
+      resultsContainer.innerHTML = "<p>No results found</p>";
       return;
     }
 
-    let visibleCount = 0;
     items.forEach(item => {
-      const match = item.title.toLowerCase().includes(q) || item.text.toLowerCase().includes(q);
-      item.$card.toggle(match);
-      if (match) visibleCount++;
-      item.$card.find('.card-title').html(highlightTerm(item.title, q));
-      item.$card.find('.card-text').html(highlightTerm(item.text, q));
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img class="card-img" src="${item.image}" alt="${item.title}">
+        <div class="card-body">
+          <h3 class="card-title">${item.title}</h3>
+          <p class="card-text">${item.description}</p>
+          <a href="${item.link}" class="btn">Read more</a>
+        </div>
+      `;
+      resultsContainer.appendChild(card);
     });
-
-    $('.no-results').remove();
-    if (visibleCount === 0) {
-      const $no = $('<div class="no-results">No results found</div>');
-      $('.grid-2').after($no);
-    }
   }
-
-  function renderSuggestions(rawQuery) {
-    $slist.empty();
-    $suggest.removeClass('open').attr('aria-hidden', 'true');
-
-    if (!rawQuery || rawQuery.trim().length === 0) return;
-    const q = rawQuery.trim().toLowerCase();
-
-    const matches = items
-      .map(it => {
-        const score = (it.title.toLowerCase().includes(q) ? 20 : 0) + (it.text.toLowerCase().includes(q) ? 6 : 0);
-        return { ...it, score };
-      })
-      .filter(it => it.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, MAX_SUGGESTIONS);
-
-    if (matches.length === 0) {
-      $slist.append('<li class="empty">No matches</li>');
-      $suggest.addClass('open').attr('aria-hidden', 'false');
-      return;
-    }
-
-    matches.forEach((m) => {
-      const titleHtml = highlightTerm(m.title, q);
-
-      let snippet = m.text || '';
-      const lower = snippet.toLowerCase();
-      const pos = lower.indexOf(q);
-      if (pos >= 0) {
-        const start = Math.max(0, pos - 20);
-        snippet = snippet.substring(start, Math.min(snippet.length, pos + q.length + 30));
-        if (start > 0) snippet = '…' + snippet;
-        if (pos + q.length + 30 < m.text.length) snippet = snippet + '…';
-      } else {
-        snippet = snippet.length > 70 ? snippet.substring(0, 70) + '…' : snippet;
-      }
-      const snippetHtml = highlightTerm(snippet, q);
-
-      const thumbSrc = m.thumb && m.thumb.length ? m.thumb : PLACEHOLDER_THUMB;
-      const $li = $(`
-        <li role="option" tabindex="-1" class="suggestion-item" data-href="${m.href}" data-title="${m.title}">
-          <img class="thumb" src="${thumbSrc}" alt="${m.title} thumbnail" loading="lazy" />
-          <div class="meta">
-            <div class="t">${titleHtml}</div>
-            <div class="s">${snippetHtml}</div>
-          </div>
-          <div class="go" aria-hidden="true">↗</div>
-        </li>
-      `);
-
-      $li.on('click', function (e) {
-        e.preventDefault();
-        const title = $(this).data('title') || '';
-        $search.val(title);
-        $suggest.removeClass('open').attr('aria-hidden', 'true');
-        filterCards(title);
-        $search.focus();
-      });
-
-      $slist.append($li);
-    });
-
-    $suggest.addClass('open').attr('aria-hidden', 'false');
-  }
-
-  let activeIndex = -1;
-  function resetActive() { activeIndex = -1; $slist.find('li').removeClass('active'); }
-
-  $search.on('keydown', function (e) {
-    const $items = $slist.find('li').not('.empty');
-    if ($items.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      activeIndex = Math.min(activeIndex + 1, $items.length - 1);
-      $items.removeClass('active').eq(activeIndex).addClass('active').focus();
-      return;
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      activeIndex = Math.max(activeIndex - 1, 0);
-      $items.removeClass('active').eq(activeIndex).addClass('active').focus();
-      return;
-    }
-    if (e.key === 'Enter') {
-      const $active = $slist.find('li.active').first();
-      if ($active.length) {
-        e.preventDefault();
-        $active.trigger('click');
-      } else {
-        const val = $search.val();
-        if (typeof filterCards === 'function') filterCards(val);
-      }
-      $suggest.removeClass('open').attr('aria-hidden', 'true');
-      resetActive();
-      return;
-    }
-    if (e.key === 'Escape') {
-      $suggest.removeClass('open').attr('aria-hidden', 'true');
-      resetActive();
-      return;
-    }
-  });
-
-  let inputTimer = null;
-  $search.on('input', function () {
-    const q = $(this).val();
-    clearTimeout(inputTimer);
-    activeIndex = -1;
-    inputTimer = setTimeout(() => {
-      renderSuggestions(q);
-      filterCards(q);
-    }, 120);
-  });
-
-  $(document).on('click', function (e) {
-    if (!$(e.target).closest('.search-wrap').length) {
-      $suggest.removeClass('open').attr('aria-hidden', 'true');
-      resetActive();
-    }
-  });
-
-  $(window).on('resize', function () {
-    $suggest.removeClass('open').attr('aria-hidden', 'true');
-    resetActive();
-  });
-
-  filterCards('');
-
 });

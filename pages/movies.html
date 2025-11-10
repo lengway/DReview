@@ -28,12 +28,24 @@
                     <p class="hero-subtitle">From indies to blockbusters. Discover and share your reviews.</p>
                 </div>
             </header>
+            <div class="container" style="text-align:center; margin: 20px 0;">
+                <input type="text" id="search-bar" placeholder="Search movies..."
+                    style="width: 90%; max-width: 600px; padding: 10px 14px; font-size: 16px;" />
+            </div>
+
 
             <div class="container">
                 <section class="section">
                     <div id="products" data-product-type="movie" class="grid-2"></div>
                 </section>
             </div>
+
+
+
+
+
+
+
 
             <!-- <div class="container">
                 <input type="text" id="search-bar" placeholder="Search movies" class="search-bar" />
@@ -89,12 +101,12 @@
         <footer class="footer">
         </footer>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/scripts/products.js"></script>
-    <script src="/scripts/search.js" defer></script>
     <script src="/scripts/sidebarToggle.js" defer></script>
     <script src="/scripts/styleLoader.js" defer></script>
     <script src="/scripts/main.js" defer></script>
+
 </body>
 
 </html>

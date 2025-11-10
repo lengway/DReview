@@ -123,6 +123,35 @@
                 // document.getElementById('desc').textContent = product.short_description || ''
                 document.getElementById('cover').src = product.img_url || '/images/placeholder.png'
                 document.title = 'DReview  — ' + (product.title)
+                 //IMDb рейтинг через OMDb API
+                const OMDB_API_KEY = '75662e1c'
+
+                async function fetchOmdbRating(title) {
+                    try {
+                        const url = `https://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${OMDB_API_KEY}`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+                        if (data && data.imdbRating && data.imdbRating !== 'N/A') {
+                            return data.imdbRating;
+                        }
+                        return null;
+                    } catch (err) {
+                        console.error('Ошибка OMDb:', err);
+                        return null;
+                    }
+                }
+
+                const imdbRating = await fetchOmdbRating(product.title);
+                if (imdbRating) {
+                    const ratingEl = document.createElement('div');
+                    ratingEl.className = 'imdb-rating';
+                    ratingEl.style.marginTop = '8px';
+                    ratingEl.style.fontSize = '18px';
+                    ratingEl.textContent = `⭐ IMDb Rating: ${imdbRating}`;
+                    document.querySelector('#summary-heading').append(ratingEl);
+                }
+
+
 
                 // загрузим средний рейтинг через RPC (если есть)
                 try {

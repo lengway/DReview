@@ -121,6 +121,35 @@
                 document.getElementById('description').textContent = product.description || ''
                 document.getElementById('cover').src = product.img_url || '/images/placeholder.png'
                 document.title = 'DReview  — ' + (product.title)
+                //Рейтинг игры через RAWG API
+const RAWG_API_KEY = '13c6f521633d44d5b52b4cd25b2fd2dc' 
+
+async function fetchRawgRating(title) {
+    try {
+        const url = `https://api.rawg.io/api/games?key=${RAWG_API_KEY}&search=${encodeURIComponent(title)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.results && data.results.length > 0) {
+            const game = data.results[0];
+            return game.rating; 
+        }
+        return null;
+    } catch (err) {
+        console.error('Ошибка RAWG API:', err);
+        return null;
+    }
+}
+
+const rawgRating = await fetchRawgRating(product.title);
+if (rawgRating) {
+    const ratingEl = document.createElement('div');
+    ratingEl.className = 'rawg-rating';
+    ratingEl.style.marginTop = '8px';
+    ratingEl.style.fontSize = '18px';
+    ratingEl.textContent = `⭐ RAWG Rating: ${2*rawgRating.toFixed(1)}`;
+    document.querySelector('#summary-heading').append(ratingEl);
+}
+
 
                 // загрузим средний рейтинг через RPC (если есть)
                 try {

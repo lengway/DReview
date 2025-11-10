@@ -160,7 +160,7 @@
                 if (randomGame) {
                     featuredGrid.innerHTML += `
             <article class="card">
-                <a href="reviews/games/${randomGame.slug || randomGame.id}.html">
+                <a href="reviews/game.html?slug=${randomGame.slug || randomGame.id}">
                     <img src="${randomGame.img_url || '../images/default-game.jpg'}" alt="${randomGame.title}" class="card-img" />
                     <div class="card-body">
                         <h3 class="card-title">${randomGame.title}</h3>
@@ -174,7 +174,7 @@
                 if (randomMovie) {
                     featuredGrid.innerHTML += `
             <article class="card">
-                <a href="reviews/movies/${randomMovie.slug || randomMovie.id}.html">
+                <a href="reviews/movie.html?slug=${randomMovie.slug || randomMovie.id}">
                     <img src="${randomMovie.img_url || '../images/default-movie.jpg'}" alt="${randomMovie.title}" class="card-img" />
                     <div class="card-body">
                         <h3 class="card-title">${randomMovie.title}</h3>

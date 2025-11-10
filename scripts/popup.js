@@ -120,42 +120,80 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 export function showLocalToast(msg, type = 'info') {
-        $('.local-toast').remove();
+    $('.local-toast').remove();
 
-        const $t = $('<div></div>')
-            .addClass('local-toast')
-            .text(msg)
-            .css({
-                position: 'fixed',
-                right: '20px',
-                top: '20px',
-                padding: '10px 14px',
-                background: 'var(--card)',
-                border: '1px solid var(--overlay-3)',
-                'border-left': '4px solid var(--accent)',
-                color: 'var(--text)',
-                'border-radius': '10px',
-                'box-shadow': 'var(--shadow)',
-                'z-index': 9999,
-                opacity: 0,
-                transform: 'translateX(20px)'
-            })
-            .appendTo('body');
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
 
-        $t.animate({ opacity: 1, transform: 'translateX(0)' }, {
-            duration: 200,
+    const colors = {
+        success: 'var(--accent)',
+        error: '#ff6b6b',
+        warning: '#ffa726',
+        info: 'var(--primary)'
+    };
+
+    const icon = icons[type] || icons.info;
+    const color = colors[type] || colors.info;
+
+    const $t = $('<div></div>')
+        .addClass('local-toast')
+        .addClass(`toast-${type}`)
+        .html(`<span class="toast-icon">${icon}</span><span class="toast-message">${msg}</span>`)
+        .css({
+            position: 'fixed',
+            right: '20px',
+            top: '20px',
+            padding: '16px 20px',
+            background: 'var(--card-bg)',
+            border: '1px solid var(--card-border)',
+            'border-left': `4px solid ${color}`,
+            color: 'var(--text)',
+            'border-radius': '12px',
+            'box-shadow': '0 10px 30px rgba(0, 0, 0, 0.3)',
+            'z-index': 9999,
+            opacity: 0,
+            transform: 'translateX(20px)',
+            display: 'flex',
+            'align-items': 'center',
+            gap: '12px',
+            'min-width': '280px',
+            'max-width': '400px',
+            'backdrop-filter': 'blur(10px)'
+        })
+        .appendTo('body');
+
+    $t.find('.toast-icon').css({
+        'font-size': '20px',
+        'font-weight': 'bold',
+        color: color,
+        'flex-shrink': 0
+    });
+
+    $t.find('.toast-message').css({
+        'line-height': '1.5',
+        'flex': 1
+    });
+
+    $t.animate({ opacity: 1, transform: 'translateX(0)' }, {
+        duration: 300,
+        easing: 'swing',
+        step: function (now, fx) {
+            if (fx.prop === 'transform') $(this).css('transform', `translateX(${20 - now * 20}px)`);
+        }
+    });
+
+    setTimeout(() => {
+        $t.animate({ opacity: 0, transform: 'translateX(20px)' }, {
+            duration: 300,
+            easing: 'swing',
             step: function (now, fx) {
-                if (fx.prop === 'transform') $(this).css('transform', `translateX(${20 - now * 20}px)`);
-            }
+                if (fx.prop === 'transform') $(this).css('transform', `translateX(${now * 20}px)`);
+            },
+            complete: () => $t.remove()
         });
-
-        setTimeout(() => {
-            $t.animate({ opacity: 0, transform: 'translateX(20px)' }, {
-                duration: 300,
-                step: function (now, fx) {
-                    if (fx.prop === 'transform') $(this).css('transform', `translateX(${now * 20}px)`);
-                },
-                complete: () => $t.remove()
-            });
-        }, 2000);
-    }
+    }, type === 'error' ? 4000 : 3000);
+}

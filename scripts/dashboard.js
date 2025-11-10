@@ -33,12 +33,19 @@ const searchInput = document.getElementById('searchInput')
 const itemsGrid = document.getElementById('itemsGrid')
 const chooseFavoritePopup = document.getElementById('chooseFavoritePopup')
 const popupTitle = document.getElementById('popupTitle')
+const closePopupBtn = document.getElementById('closePopupBtn')
 
 const DEFAULT_AVATAR = 'avatar-default.svg' // файл в корне бакета avatars
 const BUCKET = 'avatars'
 
 // Глобальная переменная для отслеживания текущего типа (game или movie)
 let currentType = ''
+
+// Флаги для отслеживания установленных обработчиков
+let chooseButtonsSetup = false
+let closePopupSetup = false
+let overlaySetup = false
+let searchHandlerSetup = false
 
 // --- helper: получить текущего пользователя (с обработкой ошибок) ---
 async function getCurrentUser() {
@@ -281,21 +288,32 @@ async function loadUserStats() {
 
 // --- Поиск элементов ---
 async function handleSearch() {
+    if (!currentType) {
+        return
+    }
+    
     const query = searchInput?.value.trim() || '';
+    
     const { data: items, error } = await supabase
         .from(`${currentType}s`)
         .select('id, title, img_url, short_description')
         .ilike('title', `%${query}%`)
         .limit(10);
 
-    if (!error && items) {
+    if (error) {
+        return
+    }
+    
+    if (items) {
         renderItems(items);
     }
 }
 
 // --- Рендер найденных элементов ---
 function renderItems(items) {
-    if (!itemsGrid) return;
+    if (!itemsGrid) {
+        return
+    }
     
     itemsGrid.innerHTML = items.map(item =>
         `<div class="item-card"> 
@@ -310,8 +328,9 @@ function renderItems(items) {
     // Добавляем обработчики кликов после рендеринга
     const cards = itemsGrid.querySelectorAll('.item-card');
     cards.forEach((card, index) => {
-        card.addEventListener('click', () =>
-            selectFavorite(currentType, items[index].id));
+        card.addEventListener('click', () => {
+            selectFavorite(currentType, items[index].id)
+        })
     });
 }
 
@@ -320,7 +339,6 @@ async function selectFavorite(type, id) {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
-            console.error('No user found');
             return;
         }
 
@@ -333,12 +351,13 @@ async function selectFavorite(type, id) {
             .eq('id', user.id);
             
         if (updateError) {
-            console.error('Error updating favorite:', updateError);
             return;
         }
 
         // Закрываем попап
-        if (chooseFavoritePopup) chooseFavoritePopup.hidden = true;
+        if (chooseFavoritePopup) {
+            chooseFavoritePopup.hidden = true;
+        }
         
         // Перезагружаем весь дашборд для обновления данных
         await initializeDashboard();
@@ -353,7 +372,9 @@ function updateFavoriteDisplay(type, item) {
         ? document.getElementById('favorite_game') 
         : document.getElementById('favorite_movie')
     
-    if (!container) return
+    if (!container) {
+        return
+    }
     
     container.innerHTML = `
         <div class="favorite-item has-favorite">
@@ -368,10 +389,19 @@ function updateFavoriteDisplay(type, item) {
         </div>
     `
     
-    container.querySelector('.choose-btn')?.addEventListener('click', (e) => {
-        const type = e.target.dataset.type
-        openChoosePopup(type)
-    })
+    const changeBtn = container.querySelector('.choose-btn')
+    if (changeBtn) {
+        // Проверяем, не добавлен ли уже обработчик
+        if (!changeBtn.dataset.handlerAdded) {
+            changeBtn.addEventListener('click', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                const type = e.target.dataset.type
+                openChoosePopup(type)
+            })
+            changeBtn.dataset.handlerAdded = 'true'
+        }
+    }
 }
 
 // --- Debounce для оптимизации поиска ---
@@ -397,6 +427,8 @@ async function openChoosePopup(type) {
     
     if (chooseFavoritePopup) {
         chooseFavoritePopup.hidden = false;
+    } else {
+        return
     }
     
     if (searchInput) {
@@ -409,11 +441,93 @@ async function openChoosePopup(type) {
 // --- Инициализация дашборда ---
 async function initializeDashboard() {
     await init()
+    
+    // Настраиваем обработчики ДО загрузки статистики, чтобы они работали и для динамически добавленных кнопок
+    setupChooseButtons()
+    setupClosePopupButton()
+    
     await loadUserStats()
     
-    // Добавляем обработчик поиска с debounce если есть searchInput
-    if (searchInput) {
+    // После загрузки статистики снова настраиваем кнопки (на случай если они были заменены)
+    setupChooseButtons()
+    
+    // Добавляем обработчик поиска с debounce если есть searchInput (только один раз)
+    if (!searchHandlerSetup && searchInput) {
         searchInput.addEventListener('input', debounce(handleSearch, 300));
+        searchHandlerSetup = true
+    }
+}
+
+// --- Настройка обработчиков для кнопок выбора ---
+function setupChooseButtons() {
+    // Используем делегирование событий на родительских контейнерах (только один раз)
+    if (!chooseButtonsSetup) {
+        const favoriteGameContainer = document.getElementById('favorite_game')
+        const favoriteMovieContainer = document.getElementById('favorite_movie')
+        
+        if (favoriteGameContainer) {
+            favoriteGameContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.choose-btn[data-type="game"]')
+                if (btn) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    openChoosePopup('game')
+                }
+            })
+        }
+        
+        if (favoriteMovieContainer) {
+            favoriteMovieContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.choose-btn[data-type="movie"]')
+                if (btn) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    openChoosePopup('movie')
+                }
+            })
+        }
+        
+        chooseButtonsSetup = true
+    }
+    
+    // Также добавляем прямые обработчики для существующих кнопок (на случай если делегирование не сработает)
+    const chooseButtons = document.querySelectorAll('.choose-btn[data-type]')
+    
+    chooseButtons.forEach(btn => {
+        // Проверяем, есть ли уже обработчик
+        if (!btn.dataset.handlerAdded) {
+            const type = btn.dataset.type
+            
+            btn.addEventListener('click', (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                openChoosePopup(type)
+            })
+            
+            btn.dataset.handlerAdded = 'true'
+        }
+    })
+}
+
+// --- Настройка обработчика закрытия попапа ---
+function setupClosePopupButton() {
+    if (!closePopupSetup && closePopupBtn) {
+        closePopupBtn.addEventListener('click', () => {
+            if (chooseFavoritePopup) {
+                chooseFavoritePopup.hidden = true
+            }
+        })
+        closePopupSetup = true
+    }
+    
+    // Также закрываем попап при клике на overlay (отдельный флаг)
+    if (!overlaySetup && chooseFavoritePopup) {
+        chooseFavoritePopup.addEventListener('click', (e) => {
+            if (e.target === chooseFavoritePopup) {
+                chooseFavoritePopup.hidden = true
+            }
+        })
+        overlaySetup = true
     }
 }
 

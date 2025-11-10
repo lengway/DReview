@@ -104,7 +104,6 @@
     <script type="module" src="/scripts/main.js" defer></script>
     <script src="/scripts/sidebarToggle.js" defer></script>
     <script type="module">
-        // ✅ ИСПРАВЛЕНИЕ 1: Добавлен type="module" к script тегу
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
         // Конфигурация Supabase
@@ -146,7 +145,6 @@
             return { user: data?.user ?? null, error: null }
         }
 
-        // ✅ ИСПРАВЛЕНИЕ 4: Добавлена обработка ошибок через try-catch
         (async function main() {
             try {
                 // Получаем ID пользователя из URL
@@ -181,8 +179,6 @@
 
                 console.log('User data loaded successfully:', userData)
 
-                // ✅ ИСПРАВЛЕНИЕ 2: Используем userData.id вместо user.id
-                // ✅ ИСПРАВЛЕНИЕ 5: Добавлена проверка ошибки при получении count
                 const { count, error: countError } = await supabase
                     .from('reviews')
                     .select('*', { count: 'exact', head: true })
@@ -224,7 +220,6 @@
 
                 const pageTitle = document.title = `DReview — ${userData.full_name || 'User'}`
 
-                // ✅ ИСПРАВЛЕНИЕ 3: Убрано дублирование объявления reviewsCount
                 // Обновляем счетчик отзывов
                 const reviewsCount = document.getElementById('reviews_count')
                 if (reviewsCount) {
@@ -250,7 +245,6 @@
                 }
             }
         })().catch(err => {
-            // ✅ ИСПРАВЛЕНИЕ 4: Дополнительная обработка критических ошибок
             console.error('Critical error in main:', err)
         })
 

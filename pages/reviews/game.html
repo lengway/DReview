@@ -38,6 +38,13 @@
 
                             <p class="description" id="description">
                             </p>
+                            
+                            <div class="add-review-wrapper">
+                                <button id="addReviewBtn" class="btn btn-add-review">
+                                    <span>✎</span>
+                                    <span>Add Review</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -50,11 +57,47 @@
         </footer>
     </div>
 
+    <!-- Add Review Popup -->
+    <div class="popup-overlay" id="addReviewPopup" hidden>
+        <div class="popup">
+            <button class="popup-close" id="closeReviewPopupBtn">&times;</button>
+            <div class="popup-header">
+                <h3>Add Review</h3>
+            </div>
+            <form id="addReviewForm" class="popup-content">
+                <div class="form-group">
+                    <label for="reviewTitle">Title</label>
+                    <input type="text" id="reviewTitle" placeholder="Enter review title" required>
+                </div>
+                <div class="form-group">
+                    <label for="reviewRating">Rating</label>
+                    <div class="rating-input" id="ratingInput">
+                        <span class="star" data-rating="1">⭐</span>
+                        <span class="star" data-rating="2">⭐</span>
+                        <span class="star" data-rating="3">⭐</span>
+                        <span class="star" data-rating="4">⭐</span>
+                        <span class="star" data-rating="5">⭐</span>
+                    </div>
+                    <input type="hidden" id="reviewRatingValue" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="reviewBody">Review</label>
+                    <textarea id="reviewBody" rows="6" placeholder="Write your review..." required></textarea>
+                </div>
+                <div class="popup-actions">
+                    <button type="button" class="btn btn-ghost" id="cancelReviewBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/env.js"></script>
     <script src="/scripts/main.js" defer></script>
     <script src="/scripts/sidebarToggle.js" defer></script>
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+        import { showLocalToast } from '/scripts/popup.js'
 
         // const SUPABASE_URL = 'http://127.0.0.1:54321'
         // const SUPABASE_ANON_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
@@ -166,83 +209,112 @@ if (rawgRating) {
                     console.warn('RPC call failed (ignored):', e)
                 }
 
-                // загрузим отзывы — теперь с product_type + product_id фильтрами
-                const { data: reviews, error: revErr } = await supabase
-                    .from('reviews')
-                    .select('id, rating, body, user_id, created_at, title')
-                    .eq('product_type', productType)
-                    .eq('product_id', product.id)
-                    .eq('is_published', true)
-                    .order('created_at', { ascending: false })
+                // Функция для загрузки и отображения отзывов
+                async function loadReviews() {
+                    const { data: reviews, error: revErr } = await supabase
+                        .from('reviews')
+                        .select('id, rating, body, user_id, created_at, title')
+                        .eq('product_type', productType)
+                        .eq('product_id', product.id)
+                        .eq('is_published', true)
+                        .order('created_at', { ascending: false })
 
-                if (revErr) {
-                    console.error('Ошибка загрузки отзывов:', revErr)
-                    document.getElementById('reviews').textContent = 'Ошибка при загрузке отзывов'
-                    return
-                }
+                    if (revErr) {
+                        console.error('Ошибка загрузки отзывов:', revErr)
+                        document.getElementById('reviews').textContent = 'Ошибка при загрузке отзывов'
+                        return
+                    }
 
-                const reviewsEl = document.getElementById('reviews')
-                reviewsEl.innerHTML = ''
+                    const reviewsEl = document.getElementById('reviews')
+                    reviewsEl.innerHTML = ''
 
-                if (!reviews || reviews.length === 0) {
-                    reviewsEl.textContent = 'No reviews yes — be the first. 👊'
-                    return
-                }
+                    if (!reviews || reviews.length === 0) {
+                        reviewsEl.textContent = 'No reviews yet — be the first. 👊'
+                        return
+                    }
 
-                // собираем уникальные user_id чтобы подтянуть full_name из profiles
-                const userIds = Array.from(new Set(reviews.map(r => r.user_id).filter(Boolean)))
-                let profilesMap = {}
-                if (userIds.length) {
-                    const { data: profiles, error: profErr } = await supabase
-                        .from('profiles')
-                        .select('id, full_name, avatar_url')
-                        .in('id', userIds)
+                    // собираем уникальные user_id чтобы подтянуть full_name из profiles
+                    const userIds = Array.from(new Set(reviews.map(r => r.user_id).filter(Boolean)))
+                    let profilesMap = {}
+                    if (userIds.length) {
+                        const { data: profiles, error: profErr } = await supabase
+                            .from('profiles')
+                            .select('id, full_name, avatar_url')
+                            .in('id', userIds)
 
-                    if (!profErr && profiles) {
-                        profilesMap = profiles.reduce((acc, p) => {
-                            acc[p.id] = { name: p.full_name || null, avatar: p.avatar_url || null }
-                            return acc
-                        }, {})
-                    } else if (profErr) {
-                        console.warn('Не удалось загрузить profiles:', profErr)
+                        if (!profErr && profiles) {
+                            profilesMap = profiles.reduce((acc, p) => {
+                                acc[p.id] = { name: p.full_name || null, avatar: p.avatar_url || null }
+                                return acc
+                            }, {})
+                        } else if (profErr) {
+                            console.warn('Не удалось загрузить profiles:', profErr)
+                        }
+                    }
+
+                    // рендерим отзывы с именами и аватарками из profiles
+                    for (const r of reviews) {
+                        const div = document.createElement('div')
+                        div.className = 'review'
+                        const when = r.created_at ? new Date(r.created_at).toLocaleString() : ''
+                        const profile = r.user_id ? profilesMap[r.user_id] : null
+                        const authorName = profile?.name ? profile.name : (r.user_id ? ('Пользователь ' + r.user_id.slice(0, 6)) : 'Аноним')
+                        const avatarSrc = profile?.avatar ? profile.avatar : '/images/avatar-placeholder.png'
+                        const reviewTitle = r.title ? `<h4>${escapeHtml(r.title)}</h4>` : ''
+                        div.innerHTML = `
+                            <article class="review-item">
+                                <div class="review-left">
+                                    <a href="/pages/user.html?id=${encodeURIComponent(r.user_id || '')}">
+                                        <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
+                                    </a>
+                                    <div class="review-author">${escapeHtml(authorName)}</div>
+                                    <div class="review-rating">⭐ ${escapeHtml(String(r.rating ?? '-'))}</div>
+                                </div>
+
+                                <div class="review-content">
+                                    <div class="review-body">
+                                        ${reviewTitle}
+                                        <div class="review-text">
+                                            ${escapeHtml(r.body || '')}
+                                        </div>
+                                    </div>
+                                    <div class="review-footer">
+                                        ${escapeHtml(when)}
+                                    </div>
+                                </div>
+                            </article>
+                            `
+                        reviewsEl.appendChild(div)
                     }
                 }
 
-                // рендерим отзывы с именами и аватарками из profiles
-                for (const r of reviews) {
-                    const div = document.createElement('div')
-                    div.className = 'review'
-                    const when = r.created_at ? new Date(r.created_at).toLocaleString() : ''
-                    const profile = r.user_id ? profilesMap[r.user_id] : null
-                    const authorName = profile?.name ? profile.name : (r.user_id ? ('Пользователь ' + r.user_id.slice(0, 6)) : 'Аноним')
-                    const avatarSrc = profile?.avatar ? profile.avatar : '/images/avatar-placeholder.png' // путь к плейсхолдеру
-                    const reviewTitle = r.title ? `<h4>${escapeHtml(r.title)}</h4>` : ''
-                    // div.innerHTML = `<img class="avatar" src=${escapeHtml(authorAvatar)}><strong>${escapeHtml(authorName)}</strong> — ⭐ ${escapeHtml(String(r.rating ?? '-'))} <small class="meta">· ${escapeHtml(when)}</small>
-                    //        <div>${escapeHtml(r.body || '')}</div>`
-                    div.innerHTML = `
-                        <article class="review-item">
-                            <div class="review-left">
-                                <a href="/pages/user/user.html?id=${encodeURIComponent(r.user_id || '')}">
-                                    <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
-                                </a>
-                                <div class="review-author">${escapeHtml(authorName)}</div>
-                                <div class="review-rating">⭐ ${escapeHtml(String(r.rating ?? '-'))}</div>
-                            </div>
+                // Загружаем отзывы
+                await loadReviews()
 
-                            <div class="review-content">
-                                <div class="review-body">
-                                    ${reviewTitle}
-                                    <div class="review-text">
-                                        ${escapeHtml(r.body || '')}
-                                    </div>
-                                </div>
-                                <div class="review-footer">
-                                    ${escapeHtml(when)}
-                                </div>
-                            </div>
-                        </article>
-                        `
-                    reviewsEl.appendChild(div)
+                // Сохраняем product и productType в глобальной области для использования в обработчиках
+                window.currentProduct = product
+                window.currentProductType = productType
+
+                // Проверяем, есть ли уже отзыв от текущего пользователя
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                    const { data: existingReview } = await supabase
+                        .from('reviews')
+                        .select('id')
+                        .eq('product_type', productType)
+                        .eq('product_id', product.id)
+                        .eq('user_id', user.id)
+                        .maybeSingle()
+
+                    if (existingReview) {
+                        const addReviewBtn = document.getElementById('addReviewBtn')
+                        if (addReviewBtn) {
+                            addReviewBtn.style.display = 'none'
+                        }
+                        window.hasExistingReview = true
+                    } else {
+                        window.hasExistingReview = false
+                    }
                 }
 
             } catch (err) {
@@ -251,6 +323,230 @@ if (rawgRating) {
                 document.getElementById('reviews').textContent = 'Cannot fetch data.'
             }
         })()
+
+        // Логика для добавления отзыва
+        const addReviewBtn = document.getElementById('addReviewBtn')
+        const addReviewPopup = document.getElementById('addReviewPopup')
+        const closeReviewPopupBtn = document.getElementById('closeReviewPopupBtn')
+        const cancelReviewBtn = document.getElementById('cancelReviewBtn')
+        const addReviewForm = document.getElementById('addReviewForm')
+        const ratingInput = document.getElementById('ratingInput')
+        const reviewRatingValue = document.getElementById('reviewRatingValue')
+        const stars = ratingInput.querySelectorAll('.star')
+
+        // Обработчик рейтинга (звездочки)
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                const rating = index + 1
+                reviewRatingValue.value = rating
+                stars.forEach((s, i) => {
+                    if (i < rating) {
+                        s.classList.add('active')
+                    } else {
+                        s.classList.remove('active')
+                    }
+                })
+            })
+        })
+
+        // Открытие попапа
+        addReviewBtn?.addEventListener('click', async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                showLocalToast('Please sign in to add a review', 'warning')
+                setTimeout(() => {
+                    window.location.href = '/pages/signin.html'
+                }, 1500)
+                return
+            }
+            
+            // Дополнительная проверка на существующий отзыв
+            if (window.hasExistingReview) {
+                showLocalToast('You have already submitted a review for this product', 'info')
+                return
+            }
+            
+            addReviewPopup.hidden = false
+            document.body.style.overflow = 'hidden'
+        })
+
+        // Закрытие попапа
+        function closeReviewPopup() {
+            addReviewPopup.hidden = true
+            document.body.style.overflow = ''
+            addReviewForm.reset()
+            reviewRatingValue.value = '0'
+            stars.forEach(s => s.classList.remove('active'))
+        }
+
+        closeReviewPopupBtn?.addEventListener('click', closeReviewPopup)
+        cancelReviewBtn?.addEventListener('click', closeReviewPopup)
+        addReviewPopup?.addEventListener('click', (e) => {
+            if (e.target === addReviewPopup) {
+                closeReviewPopup()
+            }
+        })
+
+        // Отправка формы
+        addReviewForm?.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                showLocalToast('Please sign in to add a review', 'warning')
+                return
+            }
+
+            // Проверка на существующий отзыв перед отправкой
+            if (window.hasExistingReview) {
+                showLocalToast('You have already submitted a review for this product', 'info')
+                closeReviewPopup()
+                return
+            }
+
+            const title = document.getElementById('reviewTitle').value.trim()
+            const rating = parseInt(reviewRatingValue.value)
+            const body = document.getElementById('reviewBody').value.trim()
+
+            if (!rating || rating < 1 || rating > 5) {
+                showLocalToast('Please select a rating', 'warning')
+                return
+            }
+
+            if (!window.currentProduct || !window.currentProductType) {
+                showLocalToast('Error: Product information not found', 'error')
+                return
+            }
+
+            const submitBtn = addReviewForm.querySelector('button[type="submit"]')
+            const originalText = submitBtn.textContent
+            submitBtn.disabled = true
+            submitBtn.textContent = 'Submitting...'
+
+            try {
+                const { error } = await supabase
+                    .from('reviews')
+                    .insert({
+                        product_type: window.currentProductType,
+                        product_id: window.currentProduct.id,
+                        user_id: user.id,
+                        title: title,
+                        rating: rating,
+                        body: body,
+                        is_published: true
+                    })
+
+                if (error) {
+                    throw error
+                }
+
+                // Помечаем, что отзыв уже есть
+                window.hasExistingReview = true
+                
+                // Скрываем кнопку
+                const addReviewBtn = document.getElementById('addReviewBtn')
+                if (addReviewBtn) {
+                    addReviewBtn.style.display = 'none'
+                }
+
+                closeReviewPopup()
+                
+                // Перезагружаем отзывы
+                if (window.loadReviews) {
+                    await window.loadReviews()
+                } else {
+                    location.reload()
+                }
+
+                showLocalToast('Review added successfully!', 'success')
+            } catch (error) {
+                console.error('Error adding review:', error)
+                showLocalToast('Failed to add review. Please try again.', 'error')
+            } finally {
+                submitBtn.disabled = false
+                submitBtn.textContent = originalText
+            }
+        })
+
+        // Делаем функцию loadReviews доступной глобально
+        window.loadReviews = async function() {
+            if (!window.currentProduct || !window.currentProductType) return
+            
+            const productType = window.currentProductType
+            const product = window.currentProduct
+            
+            const { data: reviews, error: revErr } = await supabase
+                .from('reviews')
+                .select('id, rating, body, user_id, created_at, title')
+                .eq('product_type', productType)
+                .eq('product_id', product.id)
+                .eq('is_published', true)
+                .order('created_at', { ascending: false })
+
+            if (revErr) {
+                console.error('Ошибка загрузки отзывов:', revErr)
+                document.getElementById('reviews').textContent = 'Ошибка при загрузке отзывов'
+                return
+            }
+
+            const reviewsEl = document.getElementById('reviews')
+            reviewsEl.innerHTML = ''
+
+            if (!reviews || reviews.length === 0) {
+                reviewsEl.textContent = 'No reviews yet — be the first. 👊'
+                return
+            }
+
+            const userIds = Array.from(new Set(reviews.map(r => r.user_id).filter(Boolean)))
+            let profilesMap = {}
+            if (userIds.length) {
+                const { data: profiles, error: profErr } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, avatar_url')
+                    .in('id', userIds)
+
+                if (!profErr && profiles) {
+                    profilesMap = profiles.reduce((acc, p) => {
+                        acc[p.id] = { name: p.full_name || null, avatar: p.avatar_url || null }
+                        return acc
+                    }, {})
+                }
+            }
+
+            for (const r of reviews) {
+                const div = document.createElement('div')
+                div.className = 'review'
+                const when = r.created_at ? new Date(r.created_at).toLocaleString() : ''
+                const profile = r.user_id ? profilesMap[r.user_id] : null
+                const authorName = profile?.name ? profile.name : (r.user_id ? ('Пользователь ' + r.user_id.slice(0, 6)) : 'Аноним')
+                const avatarSrc = profile?.avatar ? profile.avatar : '/images/avatar-placeholder.png'
+                const reviewTitle = r.title ? `<h4>${escapeHtml(r.title)}</h4>` : ''
+                div.innerHTML = `
+                    <article class="review-item">
+                        <div class="review-left">
+                            <a href="/pages/user.html?id=${encodeURIComponent(r.user_id || '')}&apikey=${encodeURIComponent(SUPABASE_ANON_KEY)}">
+                                <img class="review-avatar" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(authorName)}" />
+                            </a>
+                            <div class="review-author">${escapeHtml(authorName)}</div>
+                            <div class="review-rating">⭐ ${escapeHtml(String(r.rating ?? '-'))}</div>
+                        </div>
+
+                        <div class="review-content">
+                            <div class="review-body">
+                                ${reviewTitle}
+                                <div class="review-text">
+                                    ${escapeHtml(r.body || '')}
+                                </div>
+                            </div>
+                            <div class="review-footer">
+                                ${escapeHtml(when)}
+                            </div>
+                        </div>
+                    </article>
+                    `
+                reviewsEl.appendChild(div)
+            }
+        }
     </script>
 </body>
 
